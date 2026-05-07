@@ -3,6 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- PWA: manifest -->
+<link rel="manifest" href="/finanza/manifest.json">
+
+<!-- PWA: cor da barra de status no Android/iOS -->
+<meta name="theme-color" content="#0d0f14">
+
+<!-- iOS: permite instalar como app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Finanza">
+<link rel="apple-touch-icon" href="/finanza/icons/icon-192.png">
 <title>Finanza — Organizador Financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1361,6 +1372,15 @@ window.importData = async function(e) {
 
 // ── Init ─────────────────────────────────────────────────
 updateMonthDisplay();
+</script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/finanza/sw.js')
+        .then(reg => console.log('[Finanza SW] Registrado:', reg.scope))
+        .catch(err => console.warn('[Finanza SW] Erro:', err));
+    });
+  }
 </script>
 </body>
 </html>
