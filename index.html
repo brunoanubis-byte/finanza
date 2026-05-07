@@ -81,8 +81,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .month-selector span{flex:1;text-align:center;font-size:12px;}
 
 /* Mobile */
-.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:200;width:40px;height:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;backdrop-filter:blur(2px);}
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:400;width:40px;height:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:299;pointer-events:none;opacity:0;transition:opacity 0.28s;}
 
 /* ── Main ────────────────────────────────────── */
 .main{margin-left:var(--sw);flex:1;padding:32px;max-width:calc(100vw - var(--sw));}
@@ -273,13 +273,13 @@ input::placeholder{color:var(--text3);}
   .sidebar{
     transform:translateX(-100%);
     width:260px;
-    z-index:300;
+    z-index:500;
     padding:20px 14px;
     transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
   }
   .sidebar.open{transform:translateX(0);}
 
-  /* Overlay — sits BELOW sidebar, above content, pointer-events only when open */
+  /* Overlay — cobre a área de conteúdo, NÃO a sidebar */
   .sidebar-overlay{
     display:block;
     pointer-events:none;
@@ -288,10 +288,14 @@ input::placeholder{color:var(--text3);}
     z-index:299;
     backdrop-filter:none;
     background:rgba(0,0,0,0.55);
+    left:0; /* começa coberto; vai ser deslocado via JS ou CSS */
   }
   .sidebar-overlay.open{
     pointer-events:all;
     opacity:1;
+    left:260px; /* desloca para não cobrir a sidebar aberta */
+    right:0;
+    width:auto;
   }
 
   /* Main content */
