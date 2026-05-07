@@ -554,15 +554,14 @@ input::placeholder{color:var(--text3);}
 <!-- Toast -->
 <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg">Salvo</span></div>
 
-<script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, doc, collection, setDoc, getDoc, deleteDoc, onSnapshot, writeBatch, getDocs, query, where, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+<!-- Firebase compat SDKs (funciona sem type=module) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+<script>
 // ── Firebase config ──────────────────────────────────────
-const app  = initializeApp({
+firebase.initializeApp({
   apiKey: "AIzaSyDuhMK3PybGubvT6lxUlpWfjE71-joRMAo",
   authDomain: "finanza-ae1cf.firebaseapp.com",
   projectId: "finanza-ae1cf",
@@ -570,8 +569,20 @@ const app  = initializeApp({
   messagingSenderId: "828951405855",
   appId: "1:828951405855:web:ab04f8639a443cb90dfc2a"
 });
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// Firestore compat helpers — match the same call signatures used in the rest of the code
+const setDoc       = (ref, data, opts) => opts?.merge ? ref.set(data, {merge:true}) : ref.set(data);
+const getDoc       = (ref) => ref.get();
+const deleteDoc    = (ref) => ref.delete();
+const getDocs      = (ref) => ref.get();
+const onSnapshot   = (ref, cb) => ref.onSnapshot(cb);
+const writeBatch   = () => db.batch();
+const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
+
+// Path helpers: famItem('transactions','abc') → db.collection('families').doc(familyId).collection('transactions').doc('abc')
+// These are redefined inside startListeners scope — see famDoc/famCol/famItem below
 
 // ── State ────────────────────────────────────────────────
 let currentUser  = null;
@@ -616,10 +627,10 @@ const EMOJI_SETS = {
 };
 
 // ── Firestore path helpers ───────────────────────────────
-const famDoc = ()        => doc(db, 'families', familyId);
-const famCol = (col)     => collection(db, 'families', familyId, col);
-const famItem = (col,id) => doc(db, 'families', familyId, col, id);
-const userRef = (uid)    => doc(db, 'users', uid);
+const famDoc  = ()        => db.collection('families').doc(familyId);
+const famCol  = (col)     => db.collection('families').doc(familyId).collection(col);
+const famItem = (col, id) => db.collection('families').doc(familyId).collection(col).doc(id);
+const userRef = (uid)     => db.collection('users').doc(uid);
 
 // ── Sync indicator ───────────────────────────────────────
 function setSyncing(s) {
@@ -631,27 +642,27 @@ function setSyncing(s) {
 
 async function fsSet(col, id, data) {
   setSyncing('syncing');
-  try { await setDoc(famItem(col,id), data); setSyncing('ok'); }
+  try { await famItem(col,id).set(data); setSyncing('ok'); }
   catch(e) { setSyncing('error'); toast('Erro: '+e.message,'error'); }
 }
 async function fsDel(col, id) {
   setSyncing('syncing');
-  try { await deleteDoc(famItem(col,id)); setSyncing('ok'); }
+  try { await famItem(col,id).delete(); setSyncing('ok'); }
   catch(e) { setSyncing('error'); toast('Erro: '+e.message,'error'); }
 }
 
 // ── Auth ─────────────────────────────────────────────────
 window.signInGoogle = async () => {
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
   catch(e) { toast('Erro ao entrar: '+e.message,'error'); }
 };
 window.doSignOut = async () => {
   unsubscribers.forEach(u=>u()); unsubscribers=[];
-  await fbSignOut(auth);
+  await auth.signOut();
   show('screen-login');
 };
 
-onAuthStateChanged(auth, async user => {
+auth.onAuthStateChanged(async user => {
   currentUser = user;
   if (!user) { show('screen-login'); return; }
   // Update avatar/name in sidebar
@@ -659,9 +670,9 @@ onAuthStateChanged(auth, async user => {
   if (user.photoURL) { av.src=user.photoURL; av.style.display='block'; }
   document.getElementById('user-name').textContent = user.displayName || user.email;
   // Save user profile to Firestore
-  await setDoc(userRef(user.uid), { name:user.displayName||'Usuário', photo:user.photoURL||'', email:user.email }, { merge:true });
+  await userRef(user.uid).set({ name:user.displayName||'Usuário', photo:user.photoURL||'', email:user.email }, {merge:true});
   // Check if user already belongs to a family
-  const usnap = await getDoc(userRef(user.uid));
+  const usnap = await userRef(user.uid).get();
   const udata = usnap.data() || {};
   if (udata.familyId) {
     familyId = udata.familyId;
@@ -686,13 +697,13 @@ window.createFamily = async () => {
     members: { [currentUser.uid]: { name: currentUser.displayName||'Usuário', photo: currentUser.photoURL||'' } },
     createdAt: serverTimestamp()
   };
-  await setDoc(famDoc(), famData);
+  await famDoc().set(famData);
   // Seed default categories
-  const batch = writeBatch(db);
+  const batch = db.batch();
   DEFAULT_CATEGORIES.forEach(c => batch.set(famItem('categories', c.id), c));
   await batch.commit();
   // Save familyId on user
-  await setDoc(userRef(currentUser.uid), { familyId: fid }, { merge:true });
+  await userRef(currentUser.uid).set({ familyId: fid }, {merge:true});
   hide('screen-family');
   startListeners();
 };
@@ -705,17 +716,14 @@ window.joinFamily = async () => {
   const code = document.getElementById('invite-code-input').value.trim().toUpperCase();
   if (!code || code.length < 4) return;
   document.getElementById('join-error').style.display = 'none';
-  // Search families by invite code
-  const q = query(collection(db,'families'), where('inviteCode','==',code));
-  const snap = await getDocs(q);
+  const snap = await db.collection('families').where('inviteCode','==',code).get();
   if (snap.empty) { document.getElementById('join-error').style.display='block'; return; }
   const famSnap = snap.docs[0];
   familyId = famSnap.id;
-  // Add this user to the family members map
   const patch = {};
   patch[`members.${currentUser.uid}`] = { name:currentUser.displayName||'Usuário', photo:currentUser.photoURL||'' };
-  await setDoc(famDoc(), patch, { merge:true });
-  await setDoc(userRef(currentUser.uid), { familyId }, { merge:true });
+  await famDoc().set(patch, {merge:true});
+  await userRef(currentUser.uid).set({ familyId }, { merge:true });
   hide('screen-family');
   startListeners();
 };
@@ -724,30 +732,36 @@ window.joinFamily = async () => {
 function startListeners() {
   unsubscribers.forEach(u=>u()); unsubscribers=[];
 
-  // Family doc (for members list)
-  unsubscribers.push(onSnapshot(famDoc(), snap => {
-    if (!snap.exists()) return;
+  // Family doc — use compat .onSnapshot directly on the ref
+  unsubscribers.push(famDoc().onSnapshot(snap => {
+    if (!snap.exists) return;   // compat: .exists is a property, not a method
     familyData = snap.data();
     renderMembers();
     renderSettings();
   }));
 
   // Transactions
-  unsubscribers.push(onSnapshot(famCol('transactions'), snap => {
+  unsubscribers.push(famCol('transactions').onSnapshot(snap => {
     transactions = snap.docs.map(d=>({id:d.id,...d.data()}));
     renderDashboard(); applyFilters();
   }));
 
   // Recurrings
-  unsubscribers.push(onSnapshot(famCol('recurrings'), snap => {
+  unsubscribers.push(famCol('recurrings').onSnapshot(snap => {
     recurrings = snap.docs.map(d=>({id:d.id,...d.data()}));
     generateRecurring(); renderRecurrings();
   }));
 
-  // Categories
-  unsubscribers.push(onSnapshot(famCol('categories'), snap => {
+  // Categories — seed defaults on first load
+  unsubscribers.push(famCol('categories').onSnapshot(async snap => {
     categories = snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderCats(); renderDashboard(); applyFilters();
+    if (categories.length === 0) {
+      const batch = db.batch();
+      DEFAULT_CATEGORIES.forEach(c => batch.set(famItem('categories', c.id), c));
+      await batch.commit();
+    } else {
+      renderCats(); renderDashboard(); applyFilters();
+    }
   }));
 }
 
@@ -866,7 +880,7 @@ window.generateRecurring = async function(manual=false) {
   const months=[];
   for (let i=0;i<=12;i++){let m=today.getMonth()+i,y=today.getFullYear();while(m>11){m-=12;y++;}months.push({m,y});}
   let total=0;
-  const batch=writeBatch(db);
+  const batch=db.batch();
   recurrings.forEach(rec=>{
     const toCheck=rec.end?[{m:currentMonth,y:currentYear}]:months;
     toCheck.forEach(({m,y})=>{
@@ -1203,7 +1217,7 @@ window.openRecModal = function(rec=null) {
   document.getElementById('rec-day').value=rec?rec.day:new Date().getDate();
   document.getElementById('rec-freq').value=rec?rec.freq:'monthly';
   document.getElementById('rec-start').value=rec?rec.start:yyyymm(currentMonth,currentYear);
-  document.getElementById('rec-end').value=rec?(rec.end||'):'';
+  document.getElementById('rec-end').value=rec?(rec.end||''):'';
   document.getElementById('rec-modal').classList.add('open');
 };
 window.closeRecModal     = function() { document.getElementById('rec-modal').classList.remove('open'); };
@@ -1247,8 +1261,8 @@ window.importData = async function(e) {
       if(!data.transactions||!Array.isArray(data.transactions)) throw new Error();
       if(!confirm(`Importar ${data.transactions.length} transações?\nIsso vai substituir os dados atuais.`)) return;
       setSyncing('syncing');
-      const batch=writeBatch(db);
-      const [ts,rs,cs]=await Promise.all([getDocs(famCol('transactions')),getDocs(famCol('recurrings')),getDocs(famCol('categories'))]);
+      const batch=db.batch();
+      const [ts,rs,cs]=await Promise.all([famCol('transactions').get(),famCol('recurrings').get(),famCol('categories').get()]);
       ts.docs.forEach(d=>batch.delete(d.ref));rs.docs.forEach(d=>batch.delete(d.ref));cs.docs.forEach(d=>batch.delete(d.ref));
       data.transactions.forEach(t=>batch.set(famItem('transactions',t.id),t));
       (data.recurrings||[]).forEach(r=>batch.set(famItem('recurrings',r.id),r));
