@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- PWA: manifest -->
 <link rel="manifest" href="/finanza/manifest.json">
-
 <!-- PWA: cor da barra de status no Android/iOS -->
 <meta name="theme-color" content="#0d0f14">
-
 <!-- iOS: permite instalar como app -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +15,8 @@
 <title>Finanza — Organizador Financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- OneSignal SDK -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root {
   --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e29;--surface3:#212638;
@@ -69,6 +69,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .member-chip img{width:18px;height:18px;border-radius:50%;}
 .author-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface3);border:1px solid var(--border);color:var(--text3);white-space:nowrap;}
 .author-tag img{width:14px;height:14px;border-radius:50%;}
+
+/* ── Notif banner ────────────────────────────── */
+.notif-banner{display:none;align-items:center;gap:12px;padding:12px 16px;background:var(--accent-dim);border:1px solid rgba(110,231,183,0.25);border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;color:var(--accent);}
+.notif-banner.show{display:flex;}
+.notif-banner button{margin-left:auto;padding:6px 14px;border-radius:99px;border:1px solid rgba(110,231,183,0.3);background:var(--accent-dim);color:var(--accent);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.notif-banner .dismiss{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;margin-left:4px;}
 
 /* ── Layout ──────────────────────────────────── */
 .app{display:flex;min-height:100vh;position:relative;z-index:1;}
@@ -276,65 +282,21 @@ input::placeholder{color:var(--text3);}
 /* ── Responsive ──────────────────────────────── */
 @media(max-width:768px){
   :root{--sw:0px;}
-
-  /* Hamburger */
   .hamburger{display:flex;}
-
-  /* Sidebar — slides in from left, sits above everything */
-  .sidebar{
-    transform:translateX(-100%);
-    width:260px;
-    z-index:500;
-    padding:20px 14px;
-    transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
-  }
+  .sidebar{transform:translateX(-100%);width:260px;z-index:500;padding:20px 14px;transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
   .sidebar.open{transform:translateX(0);}
-
-  /* Overlay — cobre a área de conteúdo, NÃO a sidebar */
-  .sidebar-overlay{
-    display:block;
-    pointer-events:none;
-    opacity:0;
-    transition:opacity 0.28s;
-    z-index:299;
-    backdrop-filter:none;
-    background:rgba(0,0,0,0.55);
-    left:0; /* começa coberto; vai ser deslocado via JS ou CSS */
-  }
-  .sidebar-overlay.open{
-    pointer-events:all;
-    opacity:1;
-    left:260px; /* desloca para não cobrir a sidebar aberta */
-    right:0;
-    width:auto;
-  }
-
-  /* Main content */
+  .sidebar-overlay{display:block;pointer-events:none;opacity:0;transition:opacity 0.28s;z-index:299;backdrop-filter:none;background:rgba(0,0,0,0.55);left:0;}
+  .sidebar-overlay.open{pointer-events:all;opacity:1;left:260px;right:0;width:auto;}
   .main{margin-left:0;max-width:100vw;padding:12px;padding-top:68px;}
-
-  /* Summary cards — 2 col on medium, 1 col on small */
   .summary-grid{grid-template-columns:1fr 1fr;gap:10px;}
   .summary-card{padding:14px 16px;}
   .summary-value{font-size:18px;letter-spacing:-0.5px;}
   .summary-label{font-size:10px;}
   .summary-meta{font-size:11px;}
-
-  /* Charts */
   .charts-row{grid-template-columns:1fr;}
-
-  /* Forms */
   .form-grid{grid-template-columns:1fr;}
   .form-group.full{grid-column:1;}
-
-  /* Transaction items — clean mobile layout */
-  .tx-item{
-    display:grid;
-    grid-template-columns:36px 1fr auto;
-    grid-template-rows:auto auto;
-    gap:6px 10px;
-    align-items:start;
-    padding:12px;
-  }
+  .tx-item{display:grid;grid-template-columns:36px 1fr auto;grid-template-rows:auto auto;gap:6px 10px;align-items:start;padding:12px;}
   .tx-icon{grid-row:1/3;align-self:center;}
   .tx-info{grid-column:2;grid-row:1;}
   .tx-desc{font-size:14px;white-space:normal;word-break:break-word;}
@@ -344,38 +306,20 @@ input::placeholder{color:var(--text3);}
   .pay-btn{grid-column:2;grid-row:2;font-size:11px;padding:3px 10px;width:fit-content;}
   .tx-actions{grid-column:3;grid-row:2;justify-content:flex-end;}
   .tx-btn{width:32px;height:32px;font-size:15px;}
-
-  /* Filters */
   .filter-divider{display:none;}
   .filter-chip-group{flex-wrap:wrap;}
   .fchip{padding:5px 10px;font-size:11px;}
-
-  /* Page headers */
   .page-header{flex-direction:column;gap:10px;}
   .page-header .btn{width:100%;justify-content:center;}
-
-  /* Modals */
   .modal{margin:8px;max-width:calc(100vw - 16px);padding:20px;border-radius:16px;}
   .modal-title{font-size:20px;}
-
-  /* Auth card */
   .auth-card{padding:28px 20px;}
-
-  /* Charts smaller on mobile */
   .chart-container.pie{height:180px;}
   .chart-container.line{height:160px;}
-
-  /* Comparison grid */
   .comparison-grid{grid-template-columns:1fr;}
-
-  /* Rec items */
   .rec-item{flex-wrap:wrap;gap:8px;}
   .rec-badge{font-size:9px;}
-
-  /* Emoji tabs wrap */
-  #emoji-tab-btns, .modal [style*="display:flex;gap:4px"]{flex-wrap:wrap;}
 }
-
 @media(max-width:420px){
   .summary-grid{grid-template-columns:1fr;}
   .summary-value{font-size:22px;}
@@ -406,17 +350,14 @@ input::placeholder{color:var(--text3);}
     <div class="auth-logo">👨‍👩‍👧</div>
     <div class="auth-title">Bem-vindo!</div>
     <div class="auth-sub">É a primeira vez que você acessa.<br>Como quer usar o Finanza?</div>
-
     <button class="family-option" onclick="createFamily()">
       <div class="family-option-title">🏠 Criar espaço familiar</div>
       <div class="family-option-sub">Sou o primeiro. Vou convidar minha esposa/marido depois.</div>
     </button>
-
     <button class="family-option" onclick="showJoinForm()">
       <div class="family-option-title">🔗 Entrar num espaço existente</div>
       <div class="family-option-sub">Já recebi um código de convite do meu parceiro(a).</div>
     </button>
-
     <div id="join-form" style="display:none;margin-top:4px;">
       <div class="invite-input">
         <input type="text" id="invite-code-input" placeholder="CÓDIGO" maxlength="6" oninput="this.value=this.value.toUpperCase()">
@@ -439,16 +380,13 @@ input::placeholder{color:var(--text3);}
       <span class="logo-text">Finanza</span>
       <span class="family-badge" id="family-badge">família</span>
     </div>
-
     <div id="member-chips" class="member-chips" style="padding:0 4px;margin-bottom:12px;"></div>
-
     <div class="nav-section">Menu</div>
     <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></button>
     <button class="nav-item" onclick="showPage('transactions',this)"><span class="icon">↕️</span><span>Transações</span></button>
     <button class="nav-item" onclick="showPage('categories',this)"><span class="icon">🏷️</span><span>Categorias</span></button>
     <button class="nav-item" onclick="showPage('recorrentes',this)"><span class="icon">🔁</span><span>Recorrentes</span></button>
     <button class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span><span>Configurações</span></button>
-
     <div class="sidebar-footer">
       <div class="user-row">
         <img id="user-avatar" class="user-avatar" src="" alt="" style="display:none;">
@@ -471,6 +409,13 @@ input::placeholder{color:var(--text3);}
 
     <!-- Dashboard -->
     <div class="page active" id="page-dashboard">
+      <!-- Banner de permissão de notificação -->
+      <div class="notif-banner" id="notif-banner">
+        <span>🔔</span>
+        <span>Ative as notificações para ser avisado sobre vencimentos e lançamentos do parceiro.</span>
+        <button onclick="requestNotificationPermission()">Ativar</button>
+        <button class="dismiss" onclick="dismissNotifBanner()" title="Fechar">×</button>
+      </div>
       <div class="page-header">
         <div><div class="page-title">Dashboard</div><div class="page-subtitle" id="dash-subtitle">Resumo de Mai 2026</div></div>
         <button class="btn btn-primary" onclick="openModal()">＋ Nova transação</button>
@@ -558,6 +503,24 @@ input::placeholder{color:var(--text3);}
       <div class="card" style="margin-bottom:20px;">
         <div class="chart-title" style="margin-bottom:16px;">👨‍👩‍👧 Espaço familiar</div>
         <div id="family-info"></div>
+      </div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="chart-title" style="margin-bottom:16px;">🔔 Notificações</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text);">Push notifications</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Vencimentos, contas pagas e resumo semanal</div>
+          </div>
+          <button class="btn btn-ghost" onclick="requestNotificationPermission()" id="btn-notif-perm" style="padding:8px 16px;font-size:13px;">Ativar</button>
+        </div>
+        <div style="padding:12px 0;font-size:12px;color:var(--text3);">
+          <div style="margin-bottom:6px;font-weight:600;color:var(--text2);">Notificações ativas:</div>
+          <div>🔴 Conta atrasada — imediatamente ao abrir o app</div>
+          <div>🟡 Vencimento em 3 dias — diariamente às 9h</div>
+          <div>✅ Conta paga pelo parceiro — em tempo real</div>
+          <div>🔵 Nova transação do parceiro — em tempo real</div>
+          <div>📊 Resumo semanal — toda segunda-feira</div>
+        </div>
       </div>
       <div class="card" style="margin-bottom:20px;">
         <div class="chart-title" style="margin-bottom:16px;">💾 Backup</div>
@@ -650,7 +613,7 @@ input::placeholder{color:var(--text3);}
 <!-- Toast -->
 <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg">Salvo</span></div>
 
-<!-- Firebase compat SDKs (funciona sem type=module) -->
+<!-- Firebase compat SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -668,7 +631,6 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-// Firestore compat helpers — match the same call signatures used in the rest of the code
 const setDoc       = (ref, data, opts) => opts?.merge ? ref.set(data, {merge:true}) : ref.set(data);
 const getDoc       = (ref) => ref.get();
 const deleteDoc    = (ref) => ref.delete();
@@ -677,13 +639,10 @@ const onSnapshot   = (ref, cb) => ref.onSnapshot(cb);
 const writeBatch   = () => db.batch();
 const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
 
-// Path helpers: famItem('transactions','abc') → db.collection('families').doc(familyId).collection('transactions').doc('abc')
-// These are redefined inside startListeners scope — see famDoc/famCol/famItem below
-
 // ── State ────────────────────────────────────────────────
 let currentUser  = null;
-let familyId     = null;   // The shared family document ID
-let familyData   = null;   // { members: {uid: {name, photo}}, inviteCode, createdBy }
+let familyId     = null;
+let familyData   = null;
 let transactions = [];
 let recurrings   = [];
 let categories   = [];
@@ -700,6 +659,7 @@ let currentAttachment = null;
 let selectedEmoji  = '📦';
 let currentEmojiTab = 'financas';
 let filters = { type:'all', cat:'all', month:'all', paid:'all' };
+let prevTransactionIds = new Set(); // para detectar novas transações do parceiro
 
 const DEFAULT_CATEGORIES = [
   {id:'alimentacao',name:'Alimentação',emoji:'🍔'},
@@ -761,19 +721,20 @@ window.doSignOut = async () => {
 auth.onAuthStateChanged(async user => {
   currentUser = user;
   if (!user) { show('screen-login'); return; }
-  // Update avatar/name in sidebar
   const av = document.getElementById('user-avatar');
   if (user.photoURL) { av.src=user.photoURL; av.style.display='block'; }
   document.getElementById('user-name').textContent = user.displayName || user.email;
-  // Save user profile to Firestore
   await userRef(user.uid).set({ name:user.displayName||'Usuário', photo:user.photoURL||'', email:user.email }, {merge:true});
-  // Check if user already belongs to a family
   const usnap = await userRef(user.uid).get();
   const udata = usnap.data() || {};
   if (udata.familyId) {
     familyId = udata.familyId;
     startListeners();
     hide('screen-login'); hide('screen-family');
+    // Inicia OneSignal após login
+    initOneSignal();
+    // Mostra banner de notificação se ainda não permitiu
+    setTimeout(checkNotifBanner, 2000);
   } else {
     hide('screen-login');
     show('screen-family');
@@ -794,19 +755,17 @@ window.createFamily = async () => {
     createdAt: serverTimestamp()
   };
   await famDoc().set(famData);
-  // Seed default categories
   const batch = db.batch();
   DEFAULT_CATEGORIES.forEach(c => batch.set(famItem('categories', c.id), c));
   await batch.commit();
-  // Save familyId on user
   await userRef(currentUser.uid).set({ familyId: fid }, {merge:true});
   hide('screen-family');
   startListeners();
+  initOneSignal();
+  setTimeout(checkNotifBanner, 2000);
 };
 
-window.showJoinForm = () => {
-  document.getElementById('join-form').style.display = 'block';
-};
+window.showJoinForm = () => { document.getElementById('join-form').style.display = 'block'; };
 
 window.joinFamily = async () => {
   const code = document.getElementById('invite-code-input').value.trim().toUpperCase();
@@ -822,33 +781,56 @@ window.joinFamily = async () => {
   await userRef(currentUser.uid).set({ familyId }, { merge:true });
   hide('screen-family');
   startListeners();
+  initOneSignal();
+  setTimeout(checkNotifBanner, 2000);
 };
 
 // ── Real-time listeners ──────────────────────────────────
 function startListeners() {
   unsubscribers.forEach(u=>u()); unsubscribers=[];
+  let firstTransactionLoad = true;
 
-  // Family doc — use compat .onSnapshot directly on the ref
   unsubscribers.push(famDoc().onSnapshot(snap => {
-    if (!snap.exists) return;   // compat: .exists is a property, not a method
+    if (!snap.exists) return;
     familyData = snap.data();
     renderMembers();
     renderSettings();
   }));
 
-  // Transactions
   unsubscribers.push(famCol('transactions').onSnapshot(snap => {
-    transactions = snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderDashboard(); applyFilters();
+    const novas = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Detecta novas transações do parceiro (não no primeiro load)
+    if (!firstTransactionLoad) {
+      novas.forEach(tx => {
+        if (!prevTransactionIds.has(tx.id)) {
+          notificarNovaTxParceiro(tx);
+        }
+      });
+      // Detecta mudança de status (pago) por parceiro
+      novas.forEach(tx => {
+        const anterior = transactions.find(t => t.id === tx.id);
+        if (anterior && !anterior.paid && tx.paid && tx.type === 'expense') {
+          notificarContaPaga(tx, tx.authorUid);
+        }
+      });
+    }
+
+    prevTransactionIds = new Set(novas.map(t => t.id));
+    transactions = novas;
+    firstTransactionLoad = false;
+
+    renderDashboard();
+    applyFilters();
+    // Verifica notificações de vencimento após carregar transações
+    setTimeout(verificarNotificacoes, 1000);
   }));
 
-  // Recurrings
   unsubscribers.push(famCol('recurrings').onSnapshot(snap => {
     recurrings = snap.docs.map(d=>({id:d.id,...d.data()}));
     generateRecurring(); renderRecurrings();
   }));
 
-  // Categories — seed defaults on first load
   unsubscribers.push(famCol('categories').onSnapshot(async snap => {
     categories = snap.docs.map(d=>({id:d.id,...d.data()}));
     if (categories.length === 0) {
@@ -901,6 +883,8 @@ function renderSettings() {
       </div>
       <div style="font-size:12px;color:var(--text3);margin-top:8px;">Compartilhe este código com quem deseja convidar para o espaço familiar.</div>
     </div>`;
+  // Atualiza botão de notificação nas configurações
+  updateNotifButton();
 }
 
 window.copyInviteCode = function(code) {
@@ -1079,7 +1063,6 @@ window.deleteTx = async function(id) {
 window.togglePaid = async function(id) {
   const tx=transactions.find(t=>t.id===id); if (!tx) return;
   await fsSet('transactions',id,{...tx,paid:!tx.paid});
-  // Optimistic UI
   const btn=document.querySelector(`[data-pay-id="${id}"]`);
   const item=document.querySelector(`[data-tx-id="${id}"]`);
   const isPaid=!tx.paid;
@@ -1088,7 +1071,7 @@ window.togglePaid = async function(id) {
   toast(isPaid?(tx.type==='income'?'✓ Marcado como recebido!':'✓ Marcado como pago!'):'⏳ Devolvido para pendente');
 };
 
-// ── TX item HTML (with author tag) ───────────────────────
+// ── TX item HTML ─────────────────────────────────────────
 function txItemHTML(tx) {
   const cat=getCat(tx.cat);
   const isIncome=tx.type==='income';
@@ -1101,11 +1084,16 @@ function txItemHTML(tx) {
   const hasNotes=tx.notes&&tx.notes.trim();
   const hasAttach=!!tx.attachment;
   const author=getAuthorTag(tx.authorUid);
+  // Destaque visual para contas atrasadas
+  const hoje=new Date().toISOString().slice(0,10);
+  const atrasada=isExpense&&!isPaid&&tx.date<hoje;
+  const vencendoEm3=isExpense&&!isPaid&&tx.date>=hoje&&tx.date<=(()=>{const d=new Date();d.setDate(d.getDate()+3);return d.toISOString().slice(0,10);})();
+  const borderStyle=atrasada?'border-color:rgba(248,113,113,0.5);':vencendoEm3?'border-color:rgba(251,191,36,0.5);':'';
   return `
-    <div class="tx-item ${isExpense&&isPaid?'is-paid':''}" data-tx-id="${tx.id}">
+    <div class="tx-item ${isExpense&&isPaid?'is-paid':''}" data-tx-id="${tx.id}" style="${borderStyle}">
       <div class="tx-icon" style="background:${color}22;position:relative;">${cat.emoji}${tx.fromRecurring?'<span style="position:absolute;bottom:-2px;right:-2px;font-size:9px;">🔁</span>':''}</div>
       <div class="tx-info">
-        <div class="tx-desc">${tx.desc}${tx.fromRecurring?' <span style="font-size:10px;color:var(--text3);">(rec)</span>':''}</div>
+        <div class="tx-desc">${tx.desc}${atrasada?' <span style="font-size:10px;color:var(--red);font-weight:700;">ATRASADA</span>':''}${tx.fromRecurring?' <span style="font-size:10px;color:var(--text3);">(rec)</span>':''}</div>
         <div class="tx-meta">
           <span>${fmtDate(tx.date)}</span>
           ${author}
@@ -1370,10 +1358,190 @@ window.importData = async function(e) {
   reader.readAsText(file);
 };
 
+// ══════════════════════════════════════════════════════════
+// ── NOTIFICAÇÕES ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+
+// ── OneSignal init ───────────────────────────────────────
+async function initOneSignal() {
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "df61b360-dc37-4871-92d4-ce159372565c",
+      safari_web_id: "web.onesignal.auto.20000090-ae08-4d2f-988d-291912c8a9bf",
+      notifyButton: { enable: false },
+      serviceWorkerParam: { scope: '/finanza/' },
+      serviceWorkerPath: '/finanza/OneSignalSDKWorker.js',
+    });
+
+    // Vincula o usuário Firebase ao OneSignal
+    if (currentUser) {
+      try {
+        await OneSignal.login(currentUser.uid);
+        const subId = OneSignal.User.PushSubscription.id;
+        if (subId) {
+          await userRef(currentUser.uid).set({ oneSignalId: subId }, { merge: true });
+        }
+      } catch(e) { console.warn('[OneSignal] login error:', e); }
+    }
+  });
+}
+
+// ── Banner de permissão ──────────────────────────────────
+function checkNotifBanner() {
+  if (!('Notification' in window)) return;
+  const dismissed = localStorage.getItem('finanza_notif_banner_dismissed');
+  if (dismissed) return;
+  if (Notification.permission === 'granted') return;
+  document.getElementById('notif-banner')?.classList.add('show');
+}
+
+window.dismissNotifBanner = function() {
+  document.getElementById('notif-banner')?.classList.remove('show');
+  localStorage.setItem('finanza_notif_banner_dismissed', '1');
+};
+
+window.requestNotificationPermission = async function() {
+  if (!('Notification' in window)) { toast('Notificações não suportadas neste browser','error'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    document.getElementById('notif-banner')?.classList.remove('show');
+    localStorage.setItem('finanza_notif_banner_dismissed', '1');
+    toast('🔔 Notificações ativadas!');
+    updateNotifButton();
+    // Registra no OneSignal
+    OneSignalDeferred?.push(async function(OneSignal) {
+      await OneSignal.Slidedown.promptPush({ force: true });
+    });
+  } else {
+    toast('Permissão negada — ative nas configurações do browser','error');
+  }
+};
+
+function updateNotifButton() {
+  const btn = document.getElementById('btn-notif-perm');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.textContent = 'Não suportado'; btn.disabled = true; return; }
+  if (Notification.permission === 'granted') {
+    btn.textContent = '✓ Ativado';
+    btn.style.color = 'var(--accent)';
+    btn.style.borderColor = 'rgba(110,231,183,0.3)';
+    btn.disabled = true;
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = 'Bloqueado';
+    btn.style.color = 'var(--red)';
+    btn.disabled = true;
+  }
+}
+
+// ── Dispara notificação via Service Worker ───────────────
+async function dispararNotificacao(titulo, mensagem, tipo = 'info') {
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification(titulo, {
+      body: mensagem,
+      icon: '/finanza/icons/icon-192.png',
+      badge: '/finanza/icons/icon-192.png',
+      tag: `finanza-${tipo}-${Date.now()}`,
+      renotify: true,
+      vibrate: [200, 100, 200],
+      data: { url: 'https://brunoanubis-byte.github.io/finanza/' },
+    });
+  } catch(e) { console.warn('[Notif]', e); }
+}
+
+// ── Verificação diária de vencimentos ────────────────────
+async function verificarNotificacoes() {
+  if (!familyId || !currentUser || Notification.permission !== 'granted') return;
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  const ultimaVerif = localStorage.getItem('finanza_ultima_verificacao');
+  if (ultimaVerif === hoje) return;
+  localStorage.setItem('finanza_ultima_verificacao', hoje);
+
+  // 🔴 Contas atrasadas
+  const atrasadas = transactions.filter(t =>
+    t.type === 'expense' && t.paid === false && t.date < hoje
+  );
+  if (atrasadas.length > 0) {
+    const total = atrasadas.reduce((s,t) => s + t.value, 0);
+    await dispararNotificacao(
+      `🔴 ${atrasadas.length} conta(s) atrasada(s)`,
+      `Total em atraso: ${fmtCurrency(total)}. Toque para ver.`,
+      'atrasada'
+    );
+  }
+
+  // 🟡 Vencendo em até 3 dias
+  const limite = new Date();
+  limite.setDate(limite.getDate() + 3);
+  const limiteStr = limite.toISOString().slice(0, 10);
+  const vencendo = transactions.filter(t =>
+    t.type === 'expense' && t.paid === false && t.date > hoje && t.date <= limiteStr
+  );
+  if (vencendo.length > 0) {
+    const nomes = vencendo.slice(0, 2).map(t => t.desc).join(', ');
+    await dispararNotificacao(
+      `🟡 ${vencendo.length} conta(s) vencendo em breve`,
+      `${nomes}${vencendo.length > 2 ? ` e mais ${vencendo.length - 2}` : ''}`,
+      'vencendo'
+    );
+  }
+
+  // 📊 Resumo semanal (segunda-feira)
+  const diaSemana = new Date().getDay();
+  if (diaSemana === 1) {
+    const ultimoResumo = localStorage.getItem('finanza_ultimo_resumo');
+    if (ultimoResumo !== hoje) {
+      localStorage.setItem('finanza_ultimo_resumo', hoje);
+      const txsMes = getMonthTx(currentMonth, currentYear);
+      const receitas = txsMes.filter(t => t.type === 'income').reduce((s,t) => s+t.value, 0);
+      const despesas = txsMes.filter(t => t.type === 'expense').reduce((s,t) => s+t.value, 0);
+      const pendentes = txsMes.filter(t => t.type === 'expense' && !t.paid).length;
+      await dispararNotificacao(
+        '📊 Resumo semanal — Finanza',
+        `Receitas: ${fmtCurrency(receitas)} | Despesas: ${fmtCurrency(despesas)} | ${pendentes} pendente(s)`,
+        'resumo'
+      );
+    }
+  }
+}
+
+// ── Nova transação do parceiro ───────────────────────────
+function notificarNovaTxParceiro(tx) {
+  if (!currentUser || tx.authorUid === currentUser.uid) return;
+  if (!familyData?.members) return;
+  const autor = familyData.members[tx.authorUid];
+  if (!autor) return;
+  const nome = autor.name.split(' ')[0];
+  const tipo = tx.type === 'income' ? 'receita' : 'despesa';
+  dispararNotificacao(
+    `🔵 ${nome} adicionou uma ${tipo}`,
+    `${tx.desc} — ${fmtCurrency(tx.value)}`,
+    'parceiro'
+  );
+}
+
+// ── Conta paga pelo parceiro ─────────────────────────────
+function notificarContaPaga(tx, quemPagouUid) {
+  if (!currentUser || quemPagouUid === currentUser.uid) return;
+  const membro = familyData?.members?.[quemPagouUid];
+  const nome = membro ? membro.name.split(' ')[0] : 'Parceiro(a)';
+  dispararNotificacao(
+    `✅ Conta paga`,
+    `${nome} pagou "${tx.desc}" — ${fmtCurrency(tx.value)}`,
+    'paga'
+  );
+}
+
 // ── Init ─────────────────────────────────────────────────
 updateMonthDisplay();
 </script>
-  <script>
+
+<!-- Service Worker registration -->
+<script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/finanza/sw.js')
