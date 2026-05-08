@@ -1403,19 +1403,26 @@ window.dismissNotifBanner = function() {
 
 window.requestNotificationPermission = async function() {
   if (!('Notification' in window)) { toast('Notificações não suportadas neste browser','error'); return; }
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    document.getElementById('notif-banner')?.classList.remove('show');
-    localStorage.setItem('finanza_notif_banner_dismissed', '1');
-    toast('🔔 Notificações ativadas!');
-    updateNotifButton();
-    // Registra no OneSignal
-    OneSignalDeferred?.push(async function(OneSignal) {
-      await OneSignal.Slidedown.promptPush({ force: true });
-    });
-  } else {
-    toast('Permissão negada — ative nas configurações do browser','error');
-  }
+  
+  OneSignalDeferred.push(async function(OneSignal) {
+    // Pede permissão pelo OneSignal (não pelo browser diretamente)
+    await OneSignal.Notifications.requestPermission();
+    
+    const granted = OneSignal.Notifications.permission;
+    if (granted) {
+      document.getElementById('notif-banner')?.classList.remove('show');
+      localStorage.setItem('finanza_notif_banner_dismissed', '1');
+      toast('🔔 Notificações ativadas!');
+      updateNotifButton();
+      // Faz login no OneSignal com o UID do Firebase
+      if (currentUser) {
+        try { await OneSignal.login(currentUser.uid); } 
+        catch(e) { console.warn('[OneSignal login]', e); }
+      }
+    } else {
+      toast('Permissão negada — ative nas configurações do browser','error');
+    }
+  });
 };
 
 function updateNotifButton() {
