@@ -1517,11 +1517,11 @@ function notificarNovaTxParceiro(tx) {
   if (!autor) return;
   const nome = autor.name.split(' ')[0];
   const tipo = tx.type === 'income' ? 'receita' : 'despesa';
-  dispararNotificacao(
-    `🔵 ${nome} adicionou uma ${tipo}`,
-    `${tx.desc} — ${fmtCurrency(tx.value)}`,
-    'parceiro'
-  );
+  // Notifica todos os membros da família exceto quem adicionou
+  Object.keys(familyData.members).forEach(uid => {
+    if (uid === tx.authorUid) return;
+    enviarPushViaWorker(uid, `🔵 ${nome} adicionou uma ${tipo}`, `${tx.desc} — ${fmtCurrency(tx.value)}`, 'parceiro');
+  });
 }
 
 // ── Conta paga pelo parceiro ─────────────────────────────
@@ -1529,11 +1529,20 @@ function notificarContaPaga(tx, quemPagouUid) {
   if (!currentUser || quemPagouUid === currentUser.uid) return;
   const membro = familyData?.members?.[quemPagouUid];
   const nome = membro ? membro.name.split(' ')[0] : 'Parceiro(a)';
-  dispararNotificacao(
-    `✅ Conta paga`,
-    `${nome} pagou "${tx.desc}" — ${fmtCurrency(tx.value)}`,
-    'paga'
-  );
+  // Notifica todos os membros exceto quem pagou
+  Object.keys(familyData.members).forEach(uid => {
+    if (uid === quemPagouUid) return;
+    enviarPushViaWorker(uid, `✅ Conta paga`, `${nome} pagou "${tx.desc}" — ${fmtCurrency(tx.value)}`, 'paga');
+  });
+}
+async function enviarPushViaWorker(targetUid, title, message, type) {
+  try {
+    await fetch('https://finanza-notify.bruno-fb6.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetUid, title, message, type }),
+    });
+  } catch(e) { console.warn('[Push Worker]', e); }
 }
 
 // ── Init ─────────────────────────────────────────────────
