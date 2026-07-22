@@ -346,6 +346,43 @@ input::placeholder{color:var(--text3);}
   .hamburger{top:12px;left:12px;width:38px;height:38px;}
   .main{padding-top:62px;}
 }
+
+/* ── Nav icon tiles ──────────────────────────── */
+.nav-item .icon{width:28px;height:28px;border-radius:8px;background:var(--surface3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.18s;font-size:14px;}
+.nav-item .icon svg{width:15px;height:15px;}
+.nav-item:hover .icon{background:var(--border2);}
+.nav-item.active .icon{background:rgba(95,224,173,0.18);}
+
+/* ── Badge unificado nas transacoes ──────────── */
+.tx-flag{display:inline-flex;align-items:center;font-size:9px;font-weight:700;letter-spacing:0.8px;padding:2px 7px;border-radius:6px;background:var(--surface3);color:var(--text3);margin-left:8px;vertical-align:middle;}
+.tx-flag.danger{background:var(--red-dim);color:var(--red);}
+
+/* ── Grid de comprovantes no modal ───────────── */
+.attach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-bottom:10px;}
+.attach-grid:empty{display:none;margin-bottom:0;}
+.attach-tile{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface3);display:flex;align-items:center;justify-content:center;}
+.attach-tile img{width:100%;height:100%;object-fit:cover;}
+.attach-tile .pdf-ico{font-size:26px;}
+.attach-tile .att-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:6px;border:none;background:rgba(0,0,0,0.7);color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;}
+.attach-tile .att-del:hover{background:var(--red);}
+.attach-tile .att-name{position:absolute;bottom:0;left:0;right:0;font-size:8px;padding:3px 4px;background:rgba(0,0,0,0.72);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.attach-tile.busy{opacity:0.45;}
+
+/* ── Linha de status pago/recebido no modal ──── */
+.paid-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;}
+.paid-row-title{font-size:14px;font-weight:600;color:var(--text);}
+.paid-row-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+
+/* ── Consistencia entre secoes ───────────────── */
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.008));}
+.cat-card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.008));border-radius:var(--radius-sm);padding:16px;}
+.cat-card:hover{border-color:var(--border2);background:rgba(255,255,255,0.05);}
+.cat-name{font-weight:600;}
+.rec-item{background:rgba(255,255,255,0.025);}
+.rec-item:hover{background:rgba(255,255,255,0.05);}
+.fchip{font-weight:600;}
+.filter-group-label{color:var(--text3);font-weight:700;}
+.tx-cat{font-weight:600;background:var(--surface3);}
 </style>
 </head>
 <body>
@@ -407,11 +444,11 @@ input::placeholder{color:var(--text3);}
       <span style="color:var(--text3);font-size:10px;">▾</span>
     </div>
     <div class="nav-section">Menu</div>
-    <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></button>
-    <button class="nav-item" onclick="showPage('transactions',this)"><span class="icon">↕️</span><span>Transações</span></button>
-    <button class="nav-item" onclick="showPage('categories',this)"><span class="icon">🏷️</span><span>Categorias</span></button>
-    <button class="nav-item" onclick="showPage('recorrentes',this)"><span class="icon">🔁</span><span>Recorrentes</span></button>
-    <button class="nav-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span><span>Configurações</span></button>
+    <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span>Dashboard</span></button>
+    <button class="nav-item" onclick="showPage('transactions',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="15" y1="17" x2="3" y2="17"/></svg></span><span>Transações</span></button>
+    <button class="nav-item" onclick="showPage('categories',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Categorias</span></button>
+    <button class="nav-item" onclick="showPage('recorrentes',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></span><span>Recorrentes</span></button>
+    <button class="nav-item" onclick="showPage('settings',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>Configurações</span></button>
     <div class="sidebar-footer">
       <div class="user-row">
         <img id="user-avatar" class="user-avatar" src="" alt="" style="display:none;">
@@ -427,7 +464,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-c</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-d</div>
     </div>
   </nav>
 
@@ -592,10 +629,20 @@ input::placeholder{color:var(--text3);}
       <div class="form-group full"><label>Categoria</label><div style="display:flex;gap:8px;align-items:center;"><select id="tx-cat" style="flex:1;"></select><button class="btn btn-ghost" onclick="openCatModal(true)" style="padding:10px 12px;font-size:13px;white-space:nowrap;">＋ Nova</button></div></div>
       <div class="form-group full"><label>Observações <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(opcional)</span></label><textarea id="tx-notes" rows="2" placeholder="Número do boleto, referência..." style="resize:vertical;min-height:60px;"></textarea></div>
       <div class="form-group full">
-        <label>Comprovante <span style="color:var(--text3);font-weight:400;text-transform:none;">(imagem ou PDF, máx 4MB)</span></label>
+        <div class="paid-row">
+          <div>
+            <div class="paid-row-title" id="paid-row-title">Já foi pago?</div>
+            <div class="paid-row-sub" id="paid-row-sub">Marque se a despesa já foi quitada</div>
+          </div>
+          <button type="button" class="rec-toggle" id="tx-paid-toggle" onclick="toggleTxPaid()"></button>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Comprovantes <span style="color:var(--text3);font-weight:400;text-transform:none;">(imagens são comprimidas · PDF até 700 KB)</span></label>
+        <div class="attach-grid" id="attach-grid"></div>
         <div class="attach-drop" id="attach-drop" onclick="document.getElementById('tx-file').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleFileDrop(event)">
-          <input type="file" id="tx-file" accept="image/*,.pdf" style="display:none" onchange="handleFileSelect(event)">
-          <div id="attach-preview" class="attach-empty"><span style="font-size:22px;">📎</span><span>Clique ou arraste um arquivo aqui</span></div>
+          <input type="file" id="tx-file" accept="image/*,.pdf" multiple style="display:none" onchange="handleFileSelect(event)">
+          <div class="attach-empty"><span style="font-size:22px;">📎</span><span>Clique, arraste ou cole (Ctrl+V) — pode adicionar vários</span></div>
         </div>
       </div>
     </div>
@@ -650,7 +697,7 @@ input::placeholder{color:var(--text3);}
   <div class="modal" style="max-width:680px;">
     <div class="modal-header">
       <div class="modal-title" id="attach-view-title" style="font-size:16px;font-family:var(--font-body);">Comprovante</div>
-      <div style="display:flex;gap:8px;"><a id="attach-download-link" class="btn btn-ghost" style="padding:6px 14px;font-size:12px;text-decoration:none;" download>⬇ Baixar</a><button class="modal-close" onclick="closeAttachModal()">✕</button></div>
+      <div style="display:flex;gap:8px;"><a id="attach-download-link" style="display:none;" download></a><button class="modal-close" onclick="closeAttachModal()">✕</button></div>
     </div>
     <div id="attach-view-content"></div>
   </div>
@@ -701,7 +748,9 @@ let editingRecId  = null;
 let currentType   = 'income';
 let currentRecType = 'expense';
 let catModalFromTx = false;
-let currentAttachment = null;
+let pendingAttachments   = [];   // anexos abertos no modal
+let removedAttachmentIds = [];   // anexos marcados p/ exclusao ao salvar
+let currentPaid          = false;
 let selectedEmoji  = '📦';
 let currentEmojiTab = 'financas';
 let filters = { type:'all', cat:'all', month:'all', paid:'all' };
@@ -744,13 +793,13 @@ function setSyncing(s) {
 
 async function fsSet(col, id, data) {
   setSyncing('syncing');
-  try { await famItem(col,id).set(data); setSyncing('ok'); }
-  catch(e) { setSyncing('error'); toast('Erro: '+e.message,'error'); }
+  try { await famItem(col,id).set(data); setSyncing('ok'); return true; }
+  catch(e) { setSyncing('error'); toast('Erro ao salvar: '+e.message,'error'); return false; }
 }
 async function fsDel(col, id) {
   setSyncing('syncing');
-  try { await famItem(col,id).delete(); setSyncing('ok'); }
-  catch(e) { setSyncing('error'); toast('Erro: '+e.message,'error'); }
+  try { await famItem(col,id).delete(); setSyncing('ok'); return true; }
+  catch(e) { setSyncing('error'); toast('Erro ao remover: '+e.message,'error'); return false; }
 }
 
 // ── Auth ─────────────────────────────────────────────────
@@ -1019,7 +1068,7 @@ window.generateRecurring = async function(manual=false) {
       const date=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       if (transactions.find(t=>t.fromRecurring===rec.id&&t.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`))) { rec.lastGenerated=yyyymm(m,y); return; }
       const nid=uid();
-      batch.set(famItem('transactions',nid),{id:nid,desc:rec.desc,value:rec.value,date,cat:rec.cat,type:rec.type,fromRecurring:rec.id,paid:rec.type==='income',notes:'',attachment:null,authorUid:currentUser.uid,authorName:currentUser.displayName||'',authorPhoto:currentUser.photoURL||''});
+      batch.set(famItem('transactions',nid),{id:nid,desc:rec.desc,value:rec.value,date,cat:rec.cat,type:rec.type,fromRecurring:rec.id,paid:rec.type==='income',notes:'',attachment:null,attachmentCount:0,authorUid:currentUser.uid,authorName:currentUser.displayName||'',authorPhoto:currentUser.photoURL||''});
       rec.lastGenerated=yyyymm(m,y); total++;
     });
     batch.set(famItem('recurrings',rec.id),rec);
@@ -1028,58 +1077,192 @@ window.generateRecurring = async function(manual=false) {
   else if (manual) toast('Tudo em dia — nenhum lançamento pendente');
 };
 
-// ── Attachment ───────────────────────────────────────────
-window.handleFileSelect = function(e) { const f=e.target.files[0]; if(f) processFile(f); };
-window.handleFileDrop   = function(e) { e.preventDefault(); document.getElementById('attach-drop').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f) processFile(f); };
-function processFile(file) {
-  if (file.size>4*1024*1024) { toast('Arquivo muito grande — máx. 4MB','error'); return; }
-  if (!file.type.match(/image\/*/i)&&file.type!=='application/pdf') { toast('Use JPG, PNG ou PDF','error'); return; }
-  const reader=new FileReader();
-  reader.onload=ev=>{ currentAttachment={name:file.name,size:file.size,type:file.type,data:ev.target.result}; renderAttachPreview(); };
-  reader.readAsDataURL(file);
+// ── Attachment: compressao + subcolecao ──────────────────
+const ATTACH_LIMIT = 700 * 1024;   // ~700 KB de base64 por anexo (teto do doc e 1 MiB)
+
+function readFileAsDataURL(file) {
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.onerror=rej; r.readAsDataURL(file); });
 }
-function renderAttachPreview() {
-  const el=document.getElementById('attach-preview');
-  if (!currentAttachment) { el.className='attach-empty'; el.innerHTML='<span style="font-size:22px;">📎</span><span>Clique ou arraste um arquivo aqui</span>'; return; }
-  const isPdf=currentAttachment.type==='application/pdf';
-  const sz=currentAttachment.size<1048576?(currentAttachment.size/1024).toFixed(0)+' KB':(currentAttachment.size/1048576).toFixed(1)+' MB';
-  el.className='attach-preview-inner';
-  el.innerHTML=`<div class="attach-thumb">${isPdf?'📄':`<img src="${currentAttachment.data}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;">`}</div><div class="attach-info"><div class="attach-name">${currentAttachment.name}</div><div class="attach-size">${sz}</div></div><button class="attach-remove" onclick="removeAttachment(event)">✕</button>`;
+function loadImage(src) {
+  return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
 }
-window.removeAttachment = function(e) { e.stopPropagation(); currentAttachment=null; document.getElementById('tx-file').value=''; renderAttachPreview(); };
-window.viewAttachment   = function(id) {
-  const tx=transactions.find(t=>t.id===id); if(!tx?.attachment) return;
-  const a=tx.attachment;
-  document.getElementById('attach-view-title').textContent=a.name;
-  document.getElementById('attach-download-link').href=a.data;
-  document.getElementById('attach-download-link').download=a.name;
-  document.getElementById('attach-view-content').innerHTML=a.type==='application/pdf'?`<embed src="${a.data}" type="application/pdf" style="width:100%;height:65vh;border-radius:var(--radius-sm);">`:`<img src="${a.data}" class="attach-modal-img" alt="${a.name}">`;
-  document.getElementById('attach-view-modal').classList.add('open');
+
+// Reduz a imagem ate caber no limite. PDF passa direto (nao da pra recomprimir no browser).
+async function compressToLimit(file) {
+  if (file.type === 'application/pdf') {
+    const d = await readFileAsDataURL(file);
+    if (d.length > ATTACH_LIMIT) throw new Error(`PDF de ${(file.size/1024).toFixed(0)} KB é grande demais (limite ~700 KB). Tire um print e anexe como imagem.`);
+    return d;
+  }
+  const src = await readFileAsDataURL(file);
+  const img = await loadImage(src);
+  let maxDim = 1600, q = 0.72, out = src;
+  for (let i = 0; i < 6; i++) {
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if (w > maxDim || h > maxDim) { const sc = maxDim / Math.max(w,h); w = Math.round(w*sc); h = Math.round(h*sc); }
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);   // evita fundo preto em PNG transparente
+    ctx.drawImage(img, 0, 0, w, h);
+    out = c.toDataURL('image/jpeg', q);
+    if (out.length <= ATTACH_LIMIT) return out;
+    maxDim = Math.round(maxDim * 0.8);
+    q = Math.max(0.35, q - 0.1);
+  }
+  throw new Error('Imagem grande demais mesmo após compressão.');
+}
+
+window.handleFileSelect = function(e) { [...e.target.files].forEach(processFile); e.target.value=''; };
+window.handleFileDrop   = function(e) {
+  e.preventDefault();
+  document.getElementById('attach-drop').classList.remove('drag-over');
+  [...e.dataTransfer.files].forEach(processFile);
 };
-window.closeAttachModal = function() { document.getElementById('attach-view-modal').classList.remove('open'); document.getElementById('attach-view-content').innerHTML=''; };
+
+async function processFile(file) {
+  if (!file.type.match(/^image\//i) && file.type !== 'application/pdf') { toast('Use JPG, PNG ou PDF','error'); return; }
+  const slot = { name:file.name, type:file.type, size:file.size, data:null, busy:true };
+  pendingAttachments.push(slot);
+  renderAttachGrid();
+  try {
+    slot.data = await compressToLimit(file);
+    slot.size = Math.round(slot.data.length * 0.75);
+    if (file.type.match(/^image\//i)) slot.type = 'image/jpeg';
+    slot.busy = false;
+    renderAttachGrid();
+  } catch(err) {
+    pendingAttachments = pendingAttachments.filter(a => a !== slot);
+    renderAttachGrid();
+    toast(err.message, 'error');
+  }
+}
+
+// Colar print direto com Ctrl+V
+document.addEventListener('paste', e => {
+  const modal = document.getElementById('tx-modal');
+  if (!modal || !modal.classList.contains('open')) return;
+  const imgs = [...(e.clipboardData?.items || [])].filter(i => i.type.startsWith('image/'));
+  if (!imgs.length) return;
+  e.preventDefault();
+  imgs.forEach(i => { const f = i.getAsFile(); if (f) processFile(f); });
+});
+
+function renderAttachGrid() {
+  const el = document.getElementById('attach-grid');
+  if (!el) return;
+  el.innerHTML = pendingAttachments.map((a,i) => {
+    const isPdf = a.type === 'application/pdf';
+    const thumb = a.busy ? '<span class="pdf-ico">⏳</span>'
+                : isPdf   ? '<span class="pdf-ico">📄</span>'
+                          : `<img src="${a.data}" alt="">`;
+    return `<div class="attach-tile ${a.busy?'busy':''}">
+      ${thumb}
+      <button type="button" class="att-del" onclick="removeAttachment(${i})" title="Remover">✕</button>
+      <span class="att-name">${a.name}</span>
+    </div>`;
+  }).join('');
+}
+
+window.removeAttachment = function(i) {
+  const a = pendingAttachments[i];
+  if (!a) return;
+  if (a.savedId) removedAttachmentIds.push(a.savedId);
+  pendingAttachments.splice(i,1);
+  renderAttachGrid();
+};
+
+// Carrega os anexos de uma transacao sob demanda (nao vem no snapshot da lista)
+async function loadAttachments(txId) {
+  const out = [];
+  const tx = transactions.find(t => t.id === txId);
+  if (tx?.attachment) out.push({ ...tx.attachment, legacy:true });   // formato antigo inline
+  try {
+    const snap = await famCol('attachments').where('txId','==',txId).get();
+    snap.docs.forEach(d => out.push(d.data()));
+  } catch(e) { console.warn('[anexos]', e); }
+  return out;
+}
+
+window.viewAttachment = async function(txId) {
+  const content = document.getElementById('attach-view-content');
+  document.getElementById('attach-view-title').textContent = 'Comprovantes';
+  content.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">Carregando…</div>';
+  document.getElementById('attach-view-modal').classList.add('open');
+  const list = await loadAttachments(txId);
+  if (!list.length) { content.innerHTML = '<div class="empty-state"><p>Nenhum comprovante</p></div>'; return; }
+  content.innerHTML = list.map(a => `
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
+        <div style="font-size:12px;color:var(--text2);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</div>
+        <a class="btn btn-ghost" style="padding:4px 12px;font-size:11px;text-decoration:none;flex-shrink:0;" href="${a.data}" download="${a.name}">⬇ Baixar</a>
+      </div>
+      ${a.type==='application/pdf'
+        ? `<embed src="${a.data}" type="application/pdf" style="width:100%;height:60vh;border-radius:var(--radius-sm);">`
+        : `<img src="${a.data}" class="attach-modal-img" alt="${a.name}">`}
+    </div>`).join('');
+};
+
+window.closeAttachModal = function() {
+  document.getElementById('attach-view-modal').classList.remove('open');
+  document.getElementById('attach-view-content').innerHTML='';
+};
+
+// ── Toggle pago/recebido no modal ────────────────────────
+window.toggleTxPaid = function() { currentPaid = !currentPaid; updatePaidToggle(); };
+function updatePaidToggle() {
+  const t = document.getElementById('tx-paid-toggle');
+  const title = document.getElementById('paid-row-title');
+  const sub = document.getElementById('paid-row-sub');
+  if (!t) return;
+  t.className = 'rec-toggle' + (currentPaid ? ' on' : '');
+  const isInc = currentType === 'income';
+  title.textContent = isInc ? 'Já foi recebido?' : 'Já foi pago?';
+  sub.textContent = currentPaid
+    ? (isInc ? 'Marcado como recebido' : 'Marcado como pago')
+    : (isInc ? 'Ainda a receber' : 'Ainda pendente');
+}
 
 // ── Transaction modal ────────────────────────────────────
 function populateCatSelect(selId='tx-cat',selectedId=null) {
   const sel=document.getElementById(selId);
   sel.innerHTML=categories.map(c=>`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${c.emoji} ${c.name}</option>`).join('');
 }
-window.openModal = function(tx=null) {
+window.openModal = async function(tx=null) {
   editingId=tx?tx.id:null;
   document.getElementById('modal-title').textContent=tx?'Editar Transação':'Nova Transação';
   populateCatSelect('tx-cat',tx?tx.cat:null);
-  setType(tx?tx.type:'income');
+  currentType = tx?tx.type:'income';
+  setType(currentType);
   document.getElementById('tx-desc').value=tx?tx.desc:'';
   document.getElementById('tx-value').value=tx?tx.value:'';
   document.getElementById('tx-date').value=tx?tx.date:new Date().toISOString().slice(0,10);
   document.getElementById('tx-notes').value=tx?(tx.notes||''):'';
-  currentAttachment=tx?(tx.attachment||null):null;
-  renderAttachPreview();
+  pendingAttachments=[]; removedAttachmentIds=[];
+  currentPaid = tx ? (tx.paid!==false) : (currentType==='income');
+  updatePaidToggle();
+  renderAttachGrid();
   document.getElementById('tx-file').value='';
   document.getElementById('tx-modal').classList.add('open');
+  if (tx) {
+    // anexo antigo inline entra como pendente -> migra pra subcolecao ao salvar
+    if (tx.attachment) pendingAttachments.push({name:tx.attachment.name,type:tx.attachment.type,size:tx.attachment.size,data:tx.attachment.data});
+    try {
+      const snap = await famCol('attachments').where('txId','==',tx.id).get();
+      snap.docs.forEach(d=>{const a=d.data();pendingAttachments.push({savedId:a.id,name:a.name,type:a.type,size:a.size,data:a.data});});
+    } catch(e) { console.warn('[anexos]', e); }
+    renderAttachGrid();
+  }
 };
 window.closeModal     = function() { document.getElementById('tx-modal').classList.remove('open'); };
 window.closeIfOverlay = function(e) { if(e.target.id==='tx-modal') closeModal(); };
-window.setType        = function(type) { currentType=type; document.getElementById('btn-income').className='type-btn'+(type==='income'?' active-income':''); document.getElementById('btn-expense').className='type-btn'+(type==='expense'?' active-expense':''); };
+window.setType        = function(type) {
+  const mudou = currentType !== type;
+  currentType=type;
+  document.getElementById('btn-income').className='type-btn'+(type==='income'?' active-income':'');
+  document.getElementById('btn-expense').className='type-btn'+(type==='expense'?' active-expense':'');
+  if (mudou && !editingId) currentPaid = (type==='income');   // default: receita ja recebida, despesa pendente
+  updatePaidToggle();
+};
 
 window.saveTx = async function() {
   const desc=document.getElementById('tx-desc').value.trim();
@@ -1090,24 +1273,48 @@ window.saveTx = async function() {
   if (!desc) { toast('Preencha a descrição','error'); return; }
   if (!value||value<=0) { toast('Valor inválido','error'); return; }
   if (!date) { toast('Preencha a data','error'); return; }
+  if (pendingAttachments.some(a=>a.busy)) { toast('Aguarde os comprovantes terminarem de processar','error'); return; }
   const id=editingId||uid();
   const existing=editingId?transactions.find(t=>t.id===editingId):null;
-  await fsSet('transactions',id,{
-    id,desc,value,date,cat,type:currentType,notes,attachment:currentAttachment,
-    paid:existing?existing.paid:(currentType==='income'),
+  setSyncing('syncing');
+  try {
+    // 1) grava anexos novos, cada um no seu proprio documento
+    for (const a of pendingAttachments) {
+      if (a.savedId) continue;
+      const aid = uid();
+      await famCol('attachments').doc(aid).set({id:aid,txId:id,name:a.name,type:a.type,size:a.size,data:a.data,createdAt:Date.now()});
+      a.savedId = aid;
+    }
+    // 2) remove os que foram descartados
+    for (const rid of removedAttachmentIds) { try { await famCol('attachments').doc(rid).delete(); } catch(e) { console.warn(e); } }
+    removedAttachmentIds = [];
+  } catch(e) {
+    setSyncing('error');
+    toast('Erro ao salvar comprovante: '+e.message,'error');
+    return;
+  }
+  const ok = await fsSet('transactions',id,{
+    id,desc,value,date,cat,type:currentType,notes,
+    attachment:null,
+    attachmentCount:pendingAttachments.length,
+    paid:currentPaid,
     fromRecurring:existing?.fromRecurring||null,
     authorUid:existing?.authorUid||currentUser.uid,
     authorName:existing?.authorName||currentUser.displayName||'',
     authorPhoto:existing?.authorPhoto||currentUser.photoURL||'',
   });
+  if (!ok) return;                     // fsSet ja mostrou o erro real
   closeModal();
   toast(editingId?'Transação atualizada!':'Transação salva!');
 };
 
 window.deleteTx = async function(id) {
   if (!confirm('Remover esta transação?')) return;
-  await fsDel('transactions',id);
-  toast('Transação removida');
+  try {
+    const snap = await famCol('attachments').where('txId','==',id).get();
+    if (!snap.empty) { const b=db.batch(); snap.docs.forEach(d=>b.delete(d.ref)); await b.commit(); }
+  } catch(e) { console.warn('[anexos]', e); }
+  if (await fsDel('transactions',id)) toast('Transação removida');
 };
 
 window.togglePaid = async function(id) {
@@ -1132,7 +1339,8 @@ function txItemHTML(tx) {
   const payBtnClass=isIncome?(isPaid?'income-received':'income-pending'):(isPaid?'paid':'pending');
   const payBtnLabel=isIncome?(isPaid?'✓ Recebido':'○ A receber'):(isPaid?'✓ Pago':'⏳ Pendente');
   const hasNotes=tx.notes&&tx.notes.trim();
-  const hasAttach=!!tx.attachment;
+  const attachCount=(tx.attachmentCount||0)+(tx.attachment?1:0);
+  const hasAttach=attachCount>0;
   const author=getAuthorTag(tx.authorUid);
   // Destaque visual para contas atrasadas
   const hoje=new Date().toISOString().slice(0,10);
@@ -1143,12 +1351,12 @@ function txItemHTML(tx) {
     <div class="tx-item ${isExpense&&isPaid?'is-paid':''}" data-tx-id="${tx.id}" style="${borderStyle}">
       <div class="tx-icon" style="background:${color}20;position:relative;">${cat.emoji}${tx.fromRecurring?'<span style="position:absolute;bottom:-2px;right:-2px;font-size:9px;">🔁</span>':''}</div>
       <div class="tx-info">
-        <div class="tx-desc">${tx.desc}${atrasada?' <span style="font-size:10px;color:var(--red);font-weight:700;">ATRASADA</span>':''}${tx.fromRecurring?' <span style="font-size:10px;color:var(--text3);">(rec)</span>':''}</div>
+        <div class="tx-desc">${tx.desc}${(()=>{const f=[];if(atrasada)f.push('ATRASADA');if(tx.fromRecurring)f.push('REC');return f.length?`<span class="tx-flag ${atrasada?'danger':''}">${f.join(' · ')}</span>`:'';})()}</div>
         <div class="tx-meta">
           <span>${fmtDate(tx.date)}</span>
           ${author}
           ${hasNotes?`<span title="${tx.notes.replace(/"/g,'&quot;')}" style="cursor:help;color:var(--text3);font-size:11px;background:var(--surface3);padding:1px 6px;border-radius:99px;border:1px solid var(--border);">💬 obs.</span>`:''}
-          ${hasAttach?`<button class="tx-attach-btn" onclick="viewAttachment('${tx.id}')">📎 ${tx.attachment.name.length>16?tx.attachment.name.slice(0,14)+'…':tx.attachment.name}</button>`:''}
+          ${hasAttach?`<button class="tx-attach-btn" onclick="viewAttachment('${tx.id}')">📎 ${attachCount>1?attachCount+' comprovantes':'comprovante'}</button>`:''}
         </div>
       </div>
       <div class="tx-cat">${cat.name}</div>
@@ -1337,7 +1545,7 @@ window.saveCat = async function() {
   if(!name){toast('Preencha o nome','error');return;}
   const id=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
   if(categories.find(c=>c.id===id)){toast('Categoria já existe','error');return;}
-  await fsSet('categories',id,{id,name,emoji});
+  if (!await fsSet('categories',id,{id,name,emoji})) return;
   closeCatModal(); toast(`Categoria "${emoji} ${name}" criada!`);
   if(catModalFromTx){populateCatSelect('tx-cat',id);document.getElementById('tx-modal').classList.add('open');}
 };
@@ -1399,7 +1607,7 @@ window.saveRec = async function() {
   if(!start){toast('Informe o mês de início','error');return;}
   const id=editingRecId||uid();
   const existing=editingRecId?recurrings.find(r=>r.id===editingRecId):null;
-  await fsSet('recurrings',id,{id,desc,value,day,cat,type:currentRecType,freq,start,end:end||null,active:true,lastGenerated:existing?.lastGenerated||null});
+  if (!await fsSet('recurrings',id,{id,desc,value,day,cat,type:currentRecType,freq,start,end:end||null,active:true,lastGenerated:existing?.lastGenerated||null})) return;
   closeRecModal(); toast(editingRecId?'Recorrente atualizada!':'Recorrente salva!');
 };
 window.toggleRec = async function(id) { const rec=recurrings.find(r=>r.id===id); if(!rec) return; await fsSet('recurrings',id,{...rec,active:!rec.active}); };
