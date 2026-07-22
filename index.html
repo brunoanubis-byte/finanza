@@ -102,11 +102,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:299;pointer-events:none;opacity:0;transition:opacity 0.28s;}
 
 /* ── Main ────────────────────────────────────── */
-.main{margin-left:var(--sw);flex:1;padding:32px;max-width:calc(100vw - var(--sw));}
+.main{margin-left:var(--sw);flex:1;padding:40px 48px;max-width:calc(100vw - var(--sw));}
+.main-inner{max-width:1140px;margin:0 auto;width:100%;}
 .page{display:none;}
 .page.active{display:block;animation:fadeIn 0.25s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;}
 .page-title{font-family:var(--font-display);font-size:33px;font-weight:700;letter-spacing:-0.025em;color:var(--text);line-height:1.2;}
 .page-subtitle{font-size:13px;color:var(--text2);margin-top:4px;}
 
@@ -121,13 +122,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* ── Cards / Summary ─────────────────────────── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
-.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.summary-card{background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.009));border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;position:relative;overflow:hidden;transition:border-color 0.2s;}
-.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
-.summary-card.income::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
-.summary-card.expense::before{background:linear-gradient(90deg,var(--red),#fb923c);}
-.summary-card.pending-card::before{background:linear-gradient(90deg,var(--gold),#fb923c);}
-.summary-card.balance::before{background:linear-gradient(90deg,var(--blue),var(--purple));}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
+.summary-card{background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.009));border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px 20px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:120px;pointer-events:none;opacity:0.55;}
+.summary-card.income::before{background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(95,224,173,0.30) 0%,transparent 70%);}
+.summary-card.expense::before{background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(251,113,133,0.30) 0%,transparent 70%);}
+.summary-card.pending-card::before{background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(246,196,83,0.28) 0%,transparent 70%);}
+.summary-card.balance::before{background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(251,113,133,0.26) 0%,transparent 70%);}
+.summary-card>*{position:relative;z-index:1;}
 .summary-card:hover{border-color:var(--border2);}
 .summary-label{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
 .summary-value{font-family:var(--font-mono);font-size:29px;font-weight:700;letter-spacing:-0.03em;}
@@ -137,7 +139,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .summary-value.balance-neg{color:var(--red);}
 .summary-meta{font-size:12px;color:var(--text3);margin-top:8px;display:flex;align-items:center;gap:5px;}
 .summary-meta .meta-icon{font-size:11px;opacity:0.7;}
-.charts-row{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-bottom:24px;}
+.charts-row{display:grid;grid-template-columns:1fr 1.5fr;gap:18px;margin-bottom:28px;}
 .chart-card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.008));border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;position:relative;}
 .chart-title{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--text2);margin-bottom:16px;text-transform:uppercase;}
 .chart-container{position:relative;width:100%;}
@@ -164,7 +166,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .comp-delta.up{color:var(--red);}
 .comp-delta.down{color:var(--accent);}
 .comp-delta.neutral{color:var(--text3);}
-.comp-bar{height:3px;border-radius:99px;background:var(--surface3);margin-top:4px;overflow:hidden;}
+.comp-bar{height:4px;border-radius:99px;background:var(--surface3);overflow:hidden;margin-top:2px;}
 .comp-bar-fill{height:100%;border-radius:99px;transition:width 0.4s ease;}
 
 /* ── Transactions ────────────────────────────── */
@@ -303,6 +305,7 @@ input::placeholder{color:var(--text3);}
   .sidebar-overlay{display:block;pointer-events:none;opacity:0;transition:opacity 0.28s;z-index:299;backdrop-filter:none;background:rgba(0,0,0,0.55);left:0;}
   .sidebar-overlay.open{pointer-events:all;opacity:1;left:260px;right:0;width:auto;}
   .main{margin-left:0;max-width:100vw;padding:12px;padding-top:68px;}
+  .main-inner{max-width:100%;}
   .summary-grid{grid-template-columns:1fr 1fr;gap:10px;}
   .summary-card{padding:14px 16px;}
   .summary-value{font-size:18px;letter-spacing:-0.5px;}
@@ -424,10 +427,12 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-c</div>
     </div>
   </nav>
 
   <main class="main">
+    <div class="main-inner">
 
     <!-- Dashboard -->
     <div class="page active" id="page-dashboard">
@@ -571,6 +576,7 @@ input::placeholder{color:var(--text3);}
       </div>
     </div>
 
+    </div>
   </main>
 </div>
 
@@ -1241,8 +1247,8 @@ function renderComparison(txsToCurrent) {
     return `<div class="comp-card">
       <div class="comp-header"><div class="comp-cat-icon" style="background:${color}22;">${cat.emoji}</div><div class="comp-cat-name">${cat.name}</div></div>
       <div class="comp-values"><div class="comp-current">${fmtCurrency(vals.curr)}</div><div class="comp-prev">/ ${fmtCurrency(vals.prev)}</div></div>
-      <div class="comp-delta ${dClass}">${dLabel}</div>
       <div class="comp-bar"><div class="comp-bar-fill" style="width:${barPct}%;background:${color};"></div></div>
+      <div class="comp-delta ${dClass}">${dLabel}</div>
     </div>`;
   }).join('');
 }
