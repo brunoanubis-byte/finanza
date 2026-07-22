@@ -1,6 +1,6 @@
 // Finanza PWA — Service Worker
 // Versão: incrementar aqui força atualização do cache
-const CACHE_NAME = 'finanza-v1';
+const CACHE_NAME = 'finanza-v2';
 
 // Arquivos que serão cacheados no install
 const PRECACHE_URLS = [
