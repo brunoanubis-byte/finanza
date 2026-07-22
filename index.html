@@ -383,6 +383,32 @@ input::placeholder{color:var(--text3);}
 .fchip{font-weight:600;}
 .filter-group-label{color:var(--text3);font-weight:700;}
 .tx-cat{font-weight:600;background:var(--surface3);}
+
+/* ── Parcelamento ────────────────────────────── */
+.inst-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 16px;}
+.inst-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.inst-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.inst-body.open{display:block;}
+.inst-fields{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:end;}
+.inst-preview{font-size:12px;color:var(--accent);margin-top:10px;font-family:var(--font-mono);}
+.inst-preview.warn{color:var(--gold);}
+
+/* ── Divisao do casal ────────────────────────── */
+.split-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+.split-card{background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.009));border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
+.split-who{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.split-who img{width:34px;height:34px;border-radius:50%;object-fit:cover;}
+.split-who-name{font-size:14px;font-weight:700;color:var(--text);}
+.split-paid{font-family:var(--font-mono);font-size:24px;font-weight:700;letter-spacing:-0.03em;color:var(--text);}
+.split-label{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.split-bal{font-size:12px;font-weight:600;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.split-bal.pos{color:var(--accent);}
+.split-bal.neg{color:var(--red);}
+.settle-card{background:var(--accent-dim);border:1px solid rgba(95,224,173,0.25);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;}
+.settle-line{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text);margin-bottom:8px;}
+.settle-line:last-child{margin-bottom:0;}
+.settle-amount{font-family:var(--font-mono);font-weight:700;color:var(--accent);}
+.split-tx-payer{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface3);border:1px solid var(--border);color:var(--text3);}
 </style>
 </head>
 <body>
@@ -448,6 +474,7 @@ input::placeholder{color:var(--text3);}
     <button class="nav-item" onclick="showPage('transactions',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="15" y1="17" x2="3" y2="17"/></svg></span><span>Transações</span></button>
     <button class="nav-item" onclick="showPage('categories',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span><span>Categorias</span></button>
     <button class="nav-item" onclick="showPage('recorrentes',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></span><span>Recorrentes</span></button>
+    <button class="nav-item" onclick="showPage('split',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span><span>Divisão</span></button>
     <button class="nav-item" onclick="showPage('settings',this)"><span class="icon"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>Configurações</span></button>
     <div class="sidebar-footer">
       <div class="user-row">
@@ -464,7 +491,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-d</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-e</div>
     </div>
   </nav>
 
@@ -577,6 +604,19 @@ input::placeholder{color:var(--text3);}
       <div class="card"><div id="rec-list"></div></div>
     </div>
 
+    <!-- Divisao do casal -->
+    <div class="page" id="page-split">
+      <div class="page-header">
+        <div><div class="page-title">Divisão</div><div class="page-subtitle" id="split-subtitle">Acerto do mês</div></div>
+      </div>
+      <div id="settle-area"></div>
+      <div class="split-grid" id="split-grid"></div>
+      <div class="card">
+        <div class="chart-title" style="margin-bottom:12px;">Despesas compartilhadas do mês</div>
+        <div id="split-list"></div>
+      </div>
+    </div>
+
     <!-- Settings -->
     <div class="page" id="page-settings">
       <div class="page-header">
@@ -607,7 +647,8 @@ input::placeholder{color:var(--text3);}
       <div class="card" style="margin-bottom:20px;">
         <div class="chart-title" style="margin-bottom:16px;">💾 Backup</div>
         <div style="display:flex;gap:10px;">
-          <button class="btn btn-ghost" onclick="exportData()" style="flex:1;justify-content:center;">⬇ Exportar JSON</button>
+          <button class="btn btn-ghost" onclick="exportData()" style="flex:1;justify-content:center;">⬇ JSON</button>
+          <button class="btn btn-ghost" onclick="exportCSV()" style="flex:1;justify-content:center;">⬇ CSV</button>
           <label class="btn btn-ghost" style="flex:1;justify-content:center;cursor:pointer;">⬆ Importar JSON<input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)"></label>
         </div>
       </div>
@@ -628,6 +669,42 @@ input::placeholder{color:var(--text3);}
       <div class="form-group"><label>Data</label><input type="date" id="tx-date"></div>
       <div class="form-group full"><label>Categoria</label><div style="display:flex;gap:8px;align-items:center;"><select id="tx-cat" style="flex:1;"></select><button class="btn btn-ghost" onclick="openCatModal(true)" style="padding:10px 12px;font-size:13px;white-space:nowrap;">＋ Nova</button></div></div>
       <div class="form-group full"><label>Observações <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(opcional)</span></label><textarea id="tx-notes" rows="2" placeholder="Número do boleto, referência..." style="resize:vertical;min-height:60px;"></textarea></div>
+      <div class="form-group full" id="payer-group" style="display:none;">
+        <label>Quem pagou</label>
+        <select id="tx-payer"></select>
+      </div>
+      <div class="form-group full" id="shared-group">
+        <div class="paid-row">
+          <div>
+            <div class="paid-row-title">Despesa compartilhada</div>
+            <div class="paid-row-sub" id="shared-row-sub">Entra no acerto do casal</div>
+          </div>
+          <button type="button" class="rec-toggle on" id="tx-shared-toggle" onclick="toggleTxShared()"></button>
+        </div>
+      </div>
+      <div class="form-group full" id="inst-group">
+        <div class="inst-box">
+          <div class="inst-head">
+            <div>
+              <div class="paid-row-title">Parcelar</div>
+              <div class="paid-row-sub">Gera uma transação por mês</div>
+            </div>
+            <button type="button" class="rec-toggle" id="tx-inst-toggle" onclick="toggleInstallment()"></button>
+          </div>
+          <div class="inst-body" id="inst-body">
+            <div class="inst-fields">
+              <div class="form-group"><label>Parcelas</label><input type="number" id="tx-inst-count" min="2" max="60" value="2" oninput="updateInstPreview()"></div>
+              <div class="form-group"><label>O valor informado é</label>
+                <select id="tx-inst-mode" onchange="updateInstPreview()">
+                  <option value="total">o total da compra</option>
+                  <option value="parcela">o valor de cada parcela</option>
+                </select>
+              </div>
+            </div>
+            <div class="inst-preview" id="inst-preview"></div>
+          </div>
+        </div>
+      </div>
       <div class="form-group full">
         <div class="paid-row">
           <div>
@@ -751,6 +828,8 @@ let catModalFromTx = false;
 let pendingAttachments   = [];   // anexos abertos no modal
 let removedAttachmentIds = [];   // anexos marcados p/ exclusao ao salvar
 let currentPaid          = false;
+let currentShared        = true;
+let installmentOn        = false;
 let selectedEmoji  = '📦';
 let currentEmojiTab = 'financas';
 let filters = { type:'all', cat:'all', month:'all', paid:'all' };
@@ -921,6 +1000,7 @@ function startListeners() {
 
     renderDashboard();
     applyFilters();
+    if (document.getElementById('page-split')?.classList.contains('active')) renderSplit();
     // Verifica notificações de vencimento após carregar transações
     setTimeout(verificarNotificacoes, 1000);
   }));
@@ -1020,6 +1100,7 @@ window.showPage = function(id, btn) {
   if (id==='categories') renderCats();
   if (id==='recorrentes') renderRecurrings();
   if (id==='settings') renderSettings();
+  if (id==='split') renderSplit();
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
 };
@@ -1032,6 +1113,7 @@ window.changeMonth = function(dir) {
   if (currentMonth>11){currentMonth=0;currentYear++;}
   if (currentMonth<0){currentMonth=11;currentYear--;}
   updateMonthDisplay(); renderDashboard();
+  if (document.getElementById('page-split')?.classList.contains('active')) renderSplit();
 };
 function updateMonthDisplay() {
   document.getElementById('month-display').textContent=monthName(currentMonth,currentYear);
@@ -1207,6 +1289,66 @@ window.closeAttachModal = function() {
   document.getElementById('attach-view-content').innerHTML='';
 };
 
+// ── Parcelamento / divisao: helpers ──────────────────────
+// Soma meses sem estourar o dia (31/jan + 1 mes = 28/fev, nao 03/mar)
+function addMonthsClamped(dateStr, n) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const alvo = (m-1) + n;
+  const ty = y + Math.floor(alvo/12);
+  const tm = ((alvo%12)+12)%12;
+  const ultimoDia = new Date(ty, tm+1, 0).getDate();
+  return `${ty}-${String(tm+1).padStart(2,'0')}-${String(Math.min(d,ultimoDia)).padStart(2,'0')}`;
+}
+
+// Divide em centavos p/ nao perder arredondamento; sobra vai na 1a parcela
+function splitValue(total, n) {
+  const cents = Math.round(total*100);
+  const base = Math.floor(cents/n);
+  const resto = cents - base*n;
+  return Array.from({length:n},(_,i)=>((i===0?base+resto:base)/100));
+}
+
+window.toggleTxShared = function() {
+  currentShared = !currentShared;
+  document.getElementById('tx-shared-toggle').className = 'rec-toggle'+(currentShared?' on':'');
+  document.getElementById('shared-row-sub').textContent = currentShared ? 'Entra no acerto do casal' : 'Gasto pessoal — fica fora do acerto';
+};
+
+window.toggleInstallment = function() {
+  installmentOn = !installmentOn;
+  document.getElementById('tx-inst-toggle').className = 'rec-toggle'+(installmentOn?' on':'');
+  document.getElementById('inst-body').classList.toggle('open', installmentOn);
+  updateInstPreview();
+};
+
+window.updateInstPreview = function() {
+  const el = document.getElementById('inst-preview');
+  if (!el) return;
+  if (!installmentOn) { el.textContent=''; return; }
+  const n = parseInt(document.getElementById('tx-inst-count').value)||0;
+  const v = parseFloat(document.getElementById('tx-value').value)||0;
+  const modo = document.getElementById('tx-inst-mode').value;
+  if (n<2 || v<=0) { el.className='inst-preview warn'; el.textContent='Informe o valor e ao menos 2 parcelas.'; return; }
+  const parcela = modo==='total' ? v/n : v;
+  const total = modo==='total' ? v : v*n;
+  const d = document.getElementById('tx-date').value || new Date().toISOString().slice(0,10);
+  el.className='inst-preview';
+  el.textContent = `${n}x de ${fmtCurrency(parcela)} — total ${fmtCurrency(total)} · última em ${fmtDate(addMonthsClamped(d,n-1))}`;
+};
+
+function populatePayerSelect(selected) {
+  const grp = document.getElementById('payer-group');
+  const sel = document.getElementById('tx-payer');
+  const membros = Object.entries(familyData?.members||{});
+  if (!grp||!sel) return;
+  grp.style.display = membros.length>1 ? 'flex' : 'none';
+  sel.innerHTML = membros.map(([uid,m])=>{
+    const eu = uid===currentUser?.uid;
+    return `<option value="${uid}" ${uid===selected?'selected':''}>${m.name.split(' ')[0]}${eu?' (você)':''}</option>`;
+  }).join('');
+  if (!selected && currentUser) sel.value = currentUser.uid;
+}
+
 // ── Toggle pago/recebido no modal ────────────────────────
 window.toggleTxPaid = function() { currentPaid = !currentPaid; updatePaidToggle(); };
 function updatePaidToggle() {
@@ -1239,11 +1381,24 @@ window.openModal = async function(tx=null) {
   document.getElementById('tx-notes').value=tx?(tx.notes||''):'';
   pendingAttachments=[]; removedAttachmentIds=[];
   currentPaid = tx ? (tx.paid!==false) : (currentType==='income');
+  currentShared = tx ? (tx.shared!==false) : true;
+  installmentOn = false;
+  populatePayerSelect(tx ? (tx.payerUid||tx.authorUid) : (currentUser?.uid));
+  document.getElementById('tx-shared-toggle').className='rec-toggle'+(currentShared?' on':'');
+  document.getElementById('shared-row-sub').textContent = currentShared ? 'Entra no acerto do casal' : 'Gasto pessoal — fica fora do acerto';
+  document.getElementById('tx-inst-toggle').className='rec-toggle';
+  document.getElementById('inst-body').classList.remove('open');
+  document.getElementById('tx-inst-count').value=2;
+  document.getElementById('tx-inst-mode').value='total';
+  document.getElementById('inst-preview').textContent='';
+  // parcelamento so faz sentido em transacao nova
+  document.getElementById('inst-group').style.display = tx ? 'none' : 'flex';
   updatePaidToggle();
+  updateTypeDependentFields();
   renderAttachGrid();
   document.getElementById('tx-file').value='';
   document.getElementById('tx-modal').classList.add('open');
-  if (tx) {
+  if (tx && tx.id) {
     // anexo antigo inline entra como pendente -> migra pra subcolecao ao salvar
     if (tx.attachment) pendingAttachments.push({name:tx.attachment.name,type:tx.attachment.type,size:tx.attachment.size,data:tx.attachment.data});
     try {
@@ -1262,6 +1417,16 @@ window.setType        = function(type) {
   document.getElementById('btn-expense').className='type-btn'+(type==='expense'?' active-expense':'');
   if (mudou && !editingId) currentPaid = (type==='income');   // default: receita ja recebida, despesa pendente
   updatePaidToggle();
+  updateTypeDependentFields();
+};
+
+// "Compartilhada" e parcelamento so valem p/ despesa
+function updateTypeDependentFields() {
+  const sg = document.getElementById('shared-group');
+  const ig = document.getElementById('inst-group');
+  if (sg) sg.style.display = currentType==='expense' ? 'flex' : 'none';
+  if (ig) ig.style.display = (currentType==='expense' && !editingId) ? 'flex' : 'none';
+  if (currentType==='income' && installmentOn) toggleInstallment();
 };
 
 window.saveTx = async function() {
@@ -1274,6 +1439,42 @@ window.saveTx = async function() {
   if (!value||value<=0) { toast('Valor inválido','error'); return; }
   if (!date) { toast('Preencha a data','error'); return; }
   if (pendingAttachments.some(a=>a.busy)) { toast('Aguarde os comprovantes terminarem de processar','error'); return; }
+  const payerUid = document.getElementById('tx-payer')?.value || currentUser.uid;
+  const shared   = currentType==='expense' ? currentShared : false;
+
+  // ── Parcelamento: gera N transacoes de uma vez ──
+  if (installmentOn && !editingId && currentType==='expense') {
+    const n = parseInt(document.getElementById('tx-inst-count').value)||0;
+    if (n<2 || n>60) { toast('Informe entre 2 e 60 parcelas','error'); return; }
+    const modo = document.getElementById('tx-inst-mode').value;
+    const totalCompra = modo==='total' ? value : value*n;
+    const valores = splitValue(totalCompra, n);
+    const instId = 'inst_'+uid();
+    setSyncing('syncing');
+    try {
+      const batch = db.batch();
+      valores.forEach((v,i)=>{
+        const tid = uid();
+        batch.set(famItem('transactions',tid),{
+          id:tid, desc, value:v, date:addMonthsClamped(date,i), cat, type:'expense', notes,
+          attachment:null, attachmentCount:0,
+          paid: i===0 ? currentPaid : false,
+          shared, payerUid,
+          installmentId:instId, installmentNo:i+1, installmentTotal:n,
+          fromRecurring:null,
+          authorUid:currentUser.uid,
+          authorName:currentUser.displayName||'',
+          authorPhoto:currentUser.photoURL||'',
+        });
+      });
+      await batch.commit();
+      setSyncing('ok');
+    } catch(e) { setSyncing('error'); toast('Erro ao gerar parcelas: '+e.message,'error'); return; }
+    closeModal();
+    toast(`${n} parcelas de ${fmtCurrency(valores[1]||valores[0])} geradas!`);
+    return;
+  }
+
   const id=editingId||uid();
   const existing=editingId?transactions.find(t=>t.id===editingId):null;
   setSyncing('syncing');
@@ -1298,6 +1499,10 @@ window.saveTx = async function() {
     attachment:null,
     attachmentCount:pendingAttachments.length,
     paid:currentPaid,
+    shared, payerUid,
+    installmentId:existing?.installmentId||null,
+    installmentNo:existing?.installmentNo||null,
+    installmentTotal:existing?.installmentTotal||null,
     fromRecurring:existing?.fromRecurring||null,
     authorUid:existing?.authorUid||currentUser.uid,
     authorName:existing?.authorName||currentUser.displayName||'',
@@ -1309,12 +1514,47 @@ window.saveTx = async function() {
 };
 
 window.deleteTx = async function(id) {
-  if (!confirm('Remover esta transação?')) return;
+  const tx = transactions.find(t=>t.id===id);
+  // Parcelada: oferece remover so esta ou o grupo inteiro
+  if (tx?.installmentId) {
+    const grupo = transactions.filter(t=>t.installmentId===tx.installmentId);
+    const todas = confirm(`Esta é a parcela ${tx.installmentNo}/${tx.installmentTotal}.\n\nOK = remover TODAS as ${grupo.length} parcelas\nCancelar = remover só esta`);
+    if (todas) {
+      setSyncing('syncing');
+      try {
+        const batch = db.batch();
+        grupo.forEach(t=>batch.delete(famItem('transactions',t.id)));
+        await batch.commit();
+        for (const t of grupo) {
+          const sn = await famCol('attachments').where('txId','==',t.id).get();
+          if (!sn.empty) { const b2=db.batch(); sn.docs.forEach(d=>b2.delete(d.ref)); await b2.commit(); }
+        }
+        setSyncing('ok'); toast(`${grupo.length} parcelas removidas`);
+      } catch(e) { setSyncing('error'); toast('Erro: '+e.message,'error'); }
+      return;
+    }
+  } else if (!confirm('Remover esta transação?')) return;
   try {
     const snap = await famCol('attachments').where('txId','==',id).get();
     if (!snap.empty) { const b=db.batch(); snap.docs.forEach(d=>b.delete(d.ref)); await b.commit(); }
   } catch(e) { console.warn('[anexos]', e); }
   if (await fsDel('transactions',id)) toast('Transação removida');
+};
+
+window.duplicateTx = function(id) {
+  const tx = transactions.find(t=>t.id===id);
+  if (!tx) return;
+  const copia = {...tx};
+  delete copia.id;
+  copia.date = new Date().toISOString().slice(0,10);
+  copia.paid = false;
+  copia.fromRecurring = null;
+  copia.installmentId = null; copia.installmentNo = null; copia.installmentTotal = null;
+  copia.attachment = null; copia.attachmentCount = 0;
+  openModal(copia);
+  editingId = null;                                     // forca criacao de nova
+  document.getElementById('modal-title').textContent = 'Duplicar Transação';
+  updateTypeDependentFields();
 };
 
 window.togglePaid = async function(id) {
@@ -1351,7 +1591,7 @@ function txItemHTML(tx) {
     <div class="tx-item ${isExpense&&isPaid?'is-paid':''}" data-tx-id="${tx.id}" style="${borderStyle}">
       <div class="tx-icon" style="background:${color}20;position:relative;">${cat.emoji}${tx.fromRecurring?'<span style="position:absolute;bottom:-2px;right:-2px;font-size:9px;">🔁</span>':''}</div>
       <div class="tx-info">
-        <div class="tx-desc">${tx.desc}${(()=>{const f=[];if(atrasada)f.push('ATRASADA');if(tx.fromRecurring)f.push('REC');return f.length?`<span class="tx-flag ${atrasada?'danger':''}">${f.join(' · ')}</span>`:'';})()}</div>
+        <div class="tx-desc">${tx.desc}${(()=>{const f=[];if(atrasada)f.push('ATRASADA');if(tx.fromRecurring)f.push('REC');if(tx.installmentTotal)f.push(`${tx.installmentNo}/${tx.installmentTotal}`);return f.length?`<span class="tx-flag ${atrasada?'danger':''}">${f.join(' · ')}</span>`:'';})()}</div>
         <div class="tx-meta">
           <span>${fmtDate(tx.date)}</span>
           ${author}
@@ -1363,6 +1603,7 @@ function txItemHTML(tx) {
       <button class="pay-btn ${payBtnClass}" data-pay-id="${tx.id}" onclick="togglePaid('${tx.id}')">${payBtnLabel}</button>
       <div class="tx-amount ${tx.type}">${isIncome?'+':'-'} ${fmtCurrency(tx.value)}</div>
       <div class="tx-actions">
+        <button class="tx-btn" onclick="duplicateTx('${tx.id}')" title="Duplicar">⧉</button>
         <button class="tx-btn" onclick='openModal(${JSON.stringify(tx).replace(/'/g,"&#39;")})' title="Editar">✏️</button>
         <button class="tx-btn" onclick="deleteTx('${tx.id}')" title="Remover">🗑️</button>
       </div>
@@ -1612,6 +1853,130 @@ window.saveRec = async function() {
 };
 window.toggleRec = async function(id) { const rec=recurrings.find(r=>r.id===id); if(!rec) return; await fsSet('recurrings',id,{...rec,active:!rec.active}); };
 window.deleteRec = async function(id) { if(!confirm('Remover esta recorrente?\n(As transações já lançadas não serão removidas)')) return; await fsDel('recurrings',id); toast('Recorrente removida'); };
+
+// ── Divisao do casal ─────────────────────────────────────
+function renderSplit() {
+  const sub = document.getElementById('split-subtitle');
+  if (sub) sub.textContent = 'Acerto de ' + monthName(currentMonth,currentYear);
+  const membros = Object.entries(familyData?.members||{});
+  const grid = document.getElementById('split-grid');
+  const area = document.getElementById('settle-area');
+  const lista = document.getElementById('split-list');
+  if (!grid) return;
+
+  if (membros.length < 2) {
+    area.innerHTML = '';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Convide seu parceiro(a) em Configurações para usar a divisão.</p></div>';
+    lista.innerHTML = '';
+    return;
+  }
+
+  // So despesas compartilhadas entram no acerto
+  const txs = getMonthTx(currentMonth,currentYear)
+    .filter(t => t.type==='expense' && t.shared!==false);
+
+  const pagou = {};
+  membros.forEach(([uid])=>pagou[uid]=0);
+  txs.forEach(t => { const p = t.payerUid || t.authorUid; if (p in pagou) pagou[p] += t.value; });
+
+  const total = Object.values(pagou).reduce((a,b)=>a+b,0);
+  const cota  = total / membros.length;
+
+  grid.innerHTML = membros.map(([uid,m])=>{
+    const saldo = pagou[uid] - cota;
+    const cls = saldo > 0.005 ? 'pos' : saldo < -0.005 ? 'neg' : '';
+    const txt = saldo > 0.005 ? `Pagou ${fmtCurrency(saldo)} a mais`
+              : saldo < -0.005 ? `Deve ${fmtCurrency(saldo)}`
+              : 'Em dia';
+    return `<div class="split-card">
+      <div class="split-who">
+        ${m.photo?`<img src="${m.photo}" onerror="this.style.display='none'">`:'<div style="width:34px;height:34px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;">👤</div>'}
+        <div class="split-who-name">${m.name.split(' ')[0]}${uid===currentUser?.uid?' (você)':''}</div>
+      </div>
+      <div class="split-label">Pagou no mês</div>
+      <div class="split-paid">${fmtCurrency(pagou[uid])}</div>
+      <div class="split-bal ${cls}">${txt}</div>
+    </div>`;
+  }).join('');
+
+  // Acerto: quem deve pra quem (guloso, funciona p/ 2+ pessoas)
+  const saldos = membros.map(([uid,m])=>({uid,nome:m.name.split(' ')[0],v:pagou[uid]-cota}));
+  const credores = saldos.filter(x=>x.v>0.005).sort((a,b)=>b.v-a.v);
+  const devedores= saldos.filter(x=>x.v<-0.005).map(x=>({...x,v:-x.v})).sort((a,b)=>b.v-a.v);
+  const acertos=[];
+  let i=0,j=0;
+  while(i<devedores.length && j<credores.length){
+    const q=Math.min(devedores[i].v,credores[j].v);
+    acertos.push(`<div class="settle-line">💸 <strong>${devedores[i].nome}</strong> transfere <span class="settle-amount">${fmtCurrency(q)}</span> para <strong>${credores[j].nome}</strong></div>`);
+    devedores[i].v-=q; credores[j].v-=q;
+    if(devedores[i].v<0.005)i++;
+    if(credores[j].v<0.005)j++;
+  }
+  area.innerHTML = total===0
+    ? ''
+    : `<div class="settle-card">
+        <div class="split-label" style="margin-bottom:12px;">Acerto do mês · total compartilhado ${fmtCurrency(total)} · ${fmtCurrency(cota)} por pessoa</div>
+        ${acertos.length?acertos.join(''):'<div class="settle-line">✅ Tudo certo, ninguém deve nada.</div>'}
+      </div>`;
+
+  lista.innerHTML = txs.length===0
+    ? '<div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma despesa compartilhada neste mês</p></div>'
+    : [...txs].sort((a,b)=>b.date.localeCompare(a.date)).map(t=>{
+        const cat=getCat(t.cat);
+        const p=t.payerUid||t.authorUid;
+        const m=familyData?.members?.[p];
+        const cor=CAT_COLORS[Math.max(0,categories.findIndex(c=>c.id===t.cat)%CAT_COLORS.length)];
+        return `<div class="tx-item">
+          <div class="tx-icon" style="background:${cor}20;">${cat.emoji}</div>
+          <div class="tx-info">
+            <div class="tx-desc">${t.desc}</div>
+            <div class="tx-meta"><span>${fmtDate(t.date)}</span>
+              <span class="split-tx-payer">${m?.photo?`<img src="${m.photo}" style="width:14px;height:14px;border-radius:50%;" onerror="this.style.display='none'">`:'👤'} ${m?m.name.split(' ')[0]:'—'}</span>
+            </div>
+          </div>
+          <div class="tx-cat">${cat.name}</div>
+          <div class="tx-amount expense">- ${fmtCurrency(t.value)}</div>
+        </div>`;
+      }).join('');
+}
+
+// ── Exportar CSV ─────────────────────────────────────────
+window.exportCSV = function() {
+  if (!transactions.length) { toast('Nada para exportar','error'); return; }
+  const esc = v => {
+    const t = String(v ?? '');
+    return /[";\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
+  };
+  const num = v => String(Number(v).toFixed(2)).replace('.',',');   // decimal BR
+  const nome = uid => familyData?.members?.[uid]?.name || '';
+
+  const cab = ['Data','Descrição','Categoria','Tipo','Valor','Status','Quem pagou','Compartilhada','Parcela','Recorrente','Observações'];
+  const linhas = [...transactions]
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .map(t => [
+      t.date.split('-').reverse().join('/'),
+      t.desc,
+      getCat(t.cat).name,
+      t.type==='income'?'Receita':'Despesa',
+      num(t.value),
+      t.type==='income' ? (t.paid!==false?'Recebido':'A receber') : (t.paid!==false?'Pago':'Pendente'),
+      nome(t.payerUid||t.authorUid),
+      t.type==='expense' ? (t.shared!==false?'Sim':'Não') : '',
+      t.installmentTotal ? `${t.installmentNo}/${t.installmentTotal}` : '',
+      t.fromRecurring ? 'Sim' : 'Não',
+      t.notes||'',
+    ].map(esc).join(';'));
+
+  const csv = '\ufeff' + [cab.join(';'), ...linhas].join('\r\n');   // BOM p/ o Excel ler acento
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `finanza-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`CSV exportado — ${linhas.length} transações`);
+};
 
 // ── Backup / Restore ─────────────────────────────────────
 window.exportData = function() {
