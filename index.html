@@ -6,29 +6,29 @@
 <!-- PWA: manifest -->
 <link rel="manifest" href="/finanza/manifest.json">
 <!-- PWA: cor da barra de status no Android/iOS -->
-<meta name="theme-color" content="#0d0f14">
+<meta name="theme-color" content="#0a0b0e">
 <!-- iOS: permite instalar como app -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Finanza">
 <link rel="apple-touch-icon" href="/finanza/icons/icon-192.png">
 <title>Finanza — Organizador Financeiro</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <!-- OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root {
-  --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e29;--surface3:#212638;
-  --border:#2a2f42;--border2:#353c54;--text:#e8eaf2;--text2:#8b92ad;--text3:#555e7a;
-  --accent:#6ee7b7;--accent2:#34d399;--accent-dim:rgba(110,231,183,0.12);
-  --red:#f87171;--red-dim:rgba(248,113,113,0.12);
-  --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.12);
-  --gold:#fbbf24;--gold-dim:rgba(251,191,36,0.12);
-  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
-  --radius:16px;--radius-sm:10px;--shadow:0 4px 24px rgba(0,0,0,0.4);
-  --font-display:'Playfair Display',serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
-  --sw:240px;
+  --bg:#0a0b0e;--surface:#121319;--surface2:#181a22;--surface3:#20232e;
+  --border:#242836;--border2:#333a4d;--text:#eceef2;--text2:#a6abb6;--text3:#71767f;
+  --accent:#5fe0ad;--accent2:#34d399;--accent-dim:rgba(95,224,173,0.13);
+  --red:#fb7185;--red-dim:rgba(251,113,133,0.13);
+  --blue:#7ca8ff;--blue-dim:rgba(124,168,255,0.13);
+  --gold:#f6c453;--gold-dim:rgba(246,196,83,0.13);
+  --purple:#b18cff;--purple-dim:rgba(177,140,255,0.13);
+  --radius:18px;--radius-sm:12px;--shadow:0 12px 44px rgba(0,0,0,0.5);
+  --font-display:'Bricolage Grotesque',serif;--font-body:'Manrope',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --sw:264px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -326,6 +326,20 @@ input::placeholder{color:var(--text3);}
   .hamburger{top:12px;left:12px;width:38px;height:38px;}
   .main{padding-top:62px;}
 }
+
+/* ── Redesign polish (Finanza v2) ─────────────── */
+body::before{background:radial-gradient(ellipse at 12% -5%,rgba(95,224,173,0.07) 0%,transparent 45%),radial-gradient(ellipse at 105% 105%,rgba(251,113,133,0.06) 0%,transparent 50%);}
+.page-title{font-weight:700;letter-spacing:-0.025em;font-size:33px;}
+.auth-title,.modal-title{font-weight:700;letter-spacing:-0.02em;}
+.logo-text{font-weight:700;letter-spacing:-0.01em;}
+.summary-card,.chart-card,.card{background:linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.009));}
+.summary-value{font-size:29px;font-weight:700;letter-spacing:-0.03em;}
+.summary-label,.chart-title{letter-spacing:0.14em;}
+.btn-primary{background:linear-gradient(135deg,#7defc0,#34d399);box-shadow:0 10px 26px rgba(95,224,173,0.28);}
+.nav-item{font-weight:600;}
+.nav-item.active{font-weight:700;}
+.tx-item{background:rgba(255,255,255,0.025);}
+.tx-item:hover{background:rgba(255,255,255,0.05);}
 </style>
 </head>
 <body>
@@ -672,7 +686,7 @@ const DEFAULT_CATEGORIES = [
   {id:'moradia',name:'Moradia',emoji:'🏠'},
   {id:'outros',name:'Outros',emoji:'📦'},
 ];
-const CAT_COLORS = ['#6ee7b7','#60a5fa','#f87171','#fbbf24','#a78bfa','#fb923c','#34d399','#818cf8','#f472b6','#38bdf8'];
+const CAT_COLORS = ['#5fe0ad','#7ca8ff','#fb7185','#f6c453','#b18cff','#fb9a52','#34d399','#8b93ff','#f97ec0','#56c5f0'];
 const FREQ_LABELS = {monthly:'Todo mês',bimonthly:'Bimestral',quarterly:'Trimestral',semiannual:'Semestral',annual:'Anual'};
 const EMOJI_SETS = {
   financas:['💰','💵','💳','🏦','💸','📊','📈','📉','💹','🤑','🪙','💎','🏧','💼','📋','🧾','📑','🗂️','📂','📁'],
@@ -1155,8 +1169,8 @@ function renderLine() {
   const balances=months.map(({m,y})=>{const txs=getMonthTx(m,y);return txs.filter(t=>t.type==='income'&&t.paid!==false).reduce((s,t)=>s+t.value,0)-txs.filter(t=>t.type==='expense'&&t.paid!==false).reduce((s,t)=>s+t.value,0);});
   const ctx=document.getElementById('line-chart').getContext('2d');
   if(lineChart)lineChart.destroy();
-  const grad=ctx.createLinearGradient(0,0,0,200);grad.addColorStop(0,'rgba(96,165,250,0.25)');grad.addColorStop(1,'rgba(96,165,250,0)');
-  lineChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data:balances,borderColor:'#60a5fa',backgroundColor:grad,borderWidth:2,fill:true,tension:0.4,pointBackgroundColor:'#60a5fa',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmtCurrency(ctx.raw)}}},scales:{x:{grid:{color:'#2a2f42'},ticks:{color:'#8b92ad',font:{family:'DM Sans'}}},y:{grid:{color:'#2a2f42'},ticks:{color:'#8b92ad',font:{family:'DM Mono',size:11},callback:v=>'R$'+(v/1000).toFixed(1)+'k'}}}}});
+  const grad=ctx.createLinearGradient(0,0,0,200);grad.addColorStop(0,'rgba(95,224,173,0.28)');grad.addColorStop(1,'rgba(95,224,173,0)');
+  lineChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{data:balances,borderColor:'#5fe0ad',backgroundColor:grad,borderWidth:2,fill:true,tension:0.4,pointBackgroundColor:'#5fe0ad',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmtCurrency(ctx.raw)}}},scales:{x:{grid:{color:'#2a2f42'},ticks:{color:'#8b92ad',font:{family:'DM Sans'}}},y:{grid:{color:'#2a2f42'},ticks:{color:'#8b92ad',font:{family:'DM Mono',size:11},callback:v=>'R$'+(v/1000).toFixed(1)+'k'}}}}});
 }
 
 function renderComparison(txsToCurrent) {
