@@ -1,3 +1,4 @@
+importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
 // Finanza PWA — Service Worker
 // Versão: incrementar aqui força atualização do cache
 const CACHE_NAME = 'finanza-v2';
