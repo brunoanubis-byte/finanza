@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-a</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-b</div>
     </div>
   </nav>
 
@@ -1280,9 +1280,12 @@ window.joinFamily = async () => {
   if (snap.empty) { document.getElementById('join-error').style.display='block'; return; }
   const famSnap = snap.docs[0];
   familyId = famSnap.id;
-  const patch = {};
-  patch[`members.${currentUser.uid}`] = { name:currentUser.displayName||'Usuário', photo:currentUser.photoURL||'' };
-  await famDoc().set(patch, {merge:true});
+  // ATENÇÃO: set() NÃO interpreta notação com ponto (members.uid) — trataria a
+  // chave literalmente e criaria um campo solto na raiz. Usar mapa aninhado:
+  // com merge:true o Firestore faz merge profundo e preserva os outros membros.
+  await famDoc().set({
+    members: { [currentUser.uid]: { name:currentUser.displayName||'Usuário', photo:currentUser.photoURL||'' } }
+  }, {merge:true});
   await userRef(currentUser.uid).set({ familyId }, { merge:true });
   hide('screen-family');
   startListeners();
@@ -1298,6 +1301,7 @@ function startListeners() {
   unsubscribers.push(famDoc().onSnapshot(snap => {
     if (!snap.exists) return;
     familyData = snap.data();
+    ensureMembership();
     renderMembers();
     renderSettings();
   }));
@@ -1364,6 +1368,20 @@ function startListeners() {
     activity = snap.docs.map(d=>({id:d.id,...d.data()}));
     if (document.getElementById('page-atividade')?.classList.contains('active')) renderAtividade();
   }));
+}
+
+// ── Auto-reparo: garante que o usuário esteja no mapa `members` ──────
+// Contas que entraram pelo código de convite antes da correção do joinFamily
+// ficaram fora do mapa. Aqui elas se registram sozinhas no próximo acesso.
+async function ensureMembership() {
+  if (!currentUser || !familyId || !familyData) return;
+  if (familyData.members && familyData.members[currentUser.uid]) return;   // já está OK
+  try {
+    await famDoc().set({
+      members: { [currentUser.uid]: { name: currentUser.displayName||'Usuário', photo: currentUser.photoURL||'' } }
+    }, {merge:true});
+    console.log('[Finanza] membro registrado no espaço familiar:', currentUser.uid);
+  } catch(e) { console.warn('[Finanza] falha ao registrar membro:', e); }
 }
 
 // ── Member chips in sidebar ──────────────────────────────
