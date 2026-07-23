@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-c</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-d</div>
     </div>
   </nav>
 
@@ -2403,7 +2403,16 @@ async function vincularUsuarioOneSignal(OneSignal) {
     await OneSignal.login(currentUser.uid);
     const sub = OneSignal.User.PushSubscription;
     console.log('[OneSignal] uid:', currentUser.uid, '| subId:', sub.id, '| optedIn:', sub.optedIn);
-    if (sub.id) await userRef(currentUser.uid).set({ oneSignalId: sub.id }, { merge: true });
+    if (sub.id) {
+      await userRef(currentUser.uid).set({ oneSignalId: sub.id }, { merge: true });
+      // Guarda também no mapa de membros: permite endereçar o push direto pela
+      // inscrição, sem depender da resolução do alias external_id.
+      if (familyId) {
+        await famDoc().set({
+          members: { [currentUser.uid]: { name: currentUser.displayName||'Usuário', photo: currentUser.photoURL||'', oneSignalId: sub.id } }
+        }, { merge: true });
+      }
+    }
     return sub.id || null;
   } catch(e) { console.warn('[OneSignal] falha ao vincular:', e); return null; }
 }
@@ -2455,12 +2464,29 @@ window.reconectarPush = async function() {
   const OS = window.__OneSignal;
   if (!OS) { toast('SDK de notificações não carregou','error'); return; }
   try {
-    if (!OS.Notifications.permission) await OS.Notifications.requestPermission();
-    if (!OS.User.PushSubscription.optedIn) await OS.User.PushSubscription.optIn();
-    try { await OS.logout(); } catch(e) {}         // limpa vínculo antigo
-    const subId = await vincularUsuarioOneSignal(OS);
-    if (subId) toast('🔔 Notificações reconectadas!');
-    else toast('Não foi possível reconectar — verifique a permissão','error');
+    // ORDEM IMPORTA no v16: primeiro garante a INSCRIÇÃO, depois identifica o
+    // usuário — o login() transfere a inscrição existente para o UID.
+    // NÃO usar logout(): ele desanexa a inscrição e cria um usuário vazio.
+    if (!OS.Notifications.permission) {
+      await OS.Notifications.requestPermission();
+      if (!OS.Notifications.permission) { toast('Permissão negada pelo navegador','error'); return; }
+    }
+    if (!OS.User.PushSubscription.optedIn) {
+      await OS.User.PushSubscription.optIn();
+    }
+    // A inscrição pode levar um instante para ser criada
+    for (let i = 0; i < 10 && !OS.User.PushSubscription.id; i++) {
+      await new Promise(r => setTimeout(r, 400));
+    }
+    const subId = OS.User.PushSubscription.id;
+    if (!subId) {
+      toast('Inscrição de push não foi criada neste aparelho','error');
+      console.warn('[reconectarPush] sem subscription id. permission:', OS.Notifications.permission, '| optedIn:', OS.User.PushSubscription.optedIn);
+      return;
+    }
+    await vincularUsuarioOneSignal(OS);
+    console.log('[reconectarPush] ✓ inscrição', subId, 'vinculada a', currentUser?.uid);
+    toast('🔔 Notificações reconectadas!');
   } catch(e) { console.warn('[reconectarPush]', e); toast('Erro: '+e.message,'error'); }
 };
 
@@ -2634,11 +2660,14 @@ function notificarContaPaga(tx) {
   });
 }
 async function enviarPushViaWorker(targetUid, title, message, type) {
+  // Endereçar pela inscrição é mais direto e imune a problemas de alias.
+  // O UID vai junto como fallback no Worker.
+  const targetSubId = familyData?.members?.[targetUid]?.oneSignalId || null;
   try {
     await fetch('https://finanza-notify.bruno-fb6.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUid, title, message, type }),
+      body: JSON.stringify({ targetUid, targetSubId, title, message, type }),
     });
   } catch(e) { console.warn('[Push Worker]', e); }
 }
