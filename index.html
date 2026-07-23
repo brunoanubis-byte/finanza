@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-b</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-c</div>
     </div>
   </nav>
 
@@ -930,6 +930,13 @@ input::placeholder{color:var(--text3);}
             <div style="font-size:12px;color:var(--text3);margin-top:2px;">Vencimentos, contas pagas e resumo semanal</div>
           </div>
           <button class="btn btn-ghost" onclick="requestNotificationPermission()" id="btn-notif-perm" style="padding:8px 16px;font-size:13px;">Ativar</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text);">Não está recebendo?</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Refaz o vínculo deste aparelho com o serviço de push</div>
+          </div>
+          <button class="btn btn-ghost" onclick="reconectarPush()" style="padding:8px 16px;font-size:13px;white-space:nowrap;">↺ Reconectar</button>
         </div>
         <div style="padding:12px 0;font-size:12px;color:var(--text3);">
           <div style="margin-bottom:6px;font-weight:600;color:var(--text2);">Notificações ativas:</div>
@@ -2386,29 +2393,76 @@ window.importData = async function(e) {
 // ══════════════════════════════════════════════════════════
 
 // ── OneSignal init ───────────────────────────────────────
+let oneSignalIniciado = false;
+
+// Vincula (ou revincula) a inscrição deste aparelho ao UID do Firebase.
+// É o que cria o alias `external_id` — sem ele o envio volta invalid_aliases.
+async function vincularUsuarioOneSignal(OneSignal) {
+  if (!currentUser) return null;
+  try {
+    await OneSignal.login(currentUser.uid);
+    const sub = OneSignal.User.PushSubscription;
+    console.log('[OneSignal] uid:', currentUser.uid, '| subId:', sub.id, '| optedIn:', sub.optedIn);
+    if (sub.id) await userRef(currentUser.uid).set({ oneSignalId: sub.id }, { merge: true });
+    return sub.id || null;
+  } catch(e) { console.warn('[OneSignal] falha ao vincular:', e); return null; }
+}
+
 async function initOneSignal() {
+  if (oneSignalIniciado) return;       // evita init duplicado (auth + create/join family)
+  oneSignalIniciado = true;
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "df61b360-dc37-4871-92d4-ce159372565c",
-      safari_web_id: "web.onesignal.auto.20000090-ae08-4d2f-988d-291912c8a9bf",
-      notifyButton: { enable: false },
-      serviceWorkerParam: { scope: '/finanza/' },
-      serviceWorkerPath: 'finanza/sw.js',
-    });
+    try {
+      await OneSignal.init({
+        appId: "df61b360-dc37-4871-92d4-ce159372565c",
+        safari_web_id: "web.onesignal.auto.20000090-ae08-4d2f-988d-291912c8a9bf",
+        notifyButton: { enable: false },
+        serviceWorkerParam: { scope: '/finanza/' },
+        serviceWorkerPath: 'finanza/sw.js',
+      });
+    } catch(e) { console.warn('[OneSignal] init:', e); }
 
-    // Vincula o usuário Firebase ao OneSignal
-    if (currentUser) {
-      try {
-        await OneSignal.login(currentUser.uid);
-        const subId = OneSignal.User.PushSubscription.id;
-        if (subId) {
-          await userRef(currentUser.uid).set({ oneSignalId: subId }, { merge: true });
-        }
-      } catch(e) { console.warn('[OneSignal] login error:', e); }
-    }
+    window.__OneSignal = OneSignal;    // exposto p/ diagnóstico no console
+    await vincularUsuarioOneSignal(OneSignal);
+
+    // A inscrição pode nascer DEPOIS do init (permissão concedida mais tarde,
+    // token renovado, reinstalação do PWA). Revincula sempre que mudar.
+    try {
+      OneSignal.User.PushSubscription.addEventListener('change', async ev => {
+        console.log('[OneSignal] inscrição mudou:', ev?.current);
+        await vincularUsuarioOneSignal(OneSignal);
+      });
+    } catch(e) { console.warn('[OneSignal] listener:', e); }
   });
 }
+
+// ── Diagnóstico e reparo do push ─────────────────────────
+window.diagPush = function() {
+  const OS = window.__OneSignal;
+  if (!OS) { console.log('❌ SDK do OneSignal não carregou (adblock?)'); return; }
+  const sub = OS.User.PushSubscription;
+  console.log('── Diagnóstico Finanza Push ──');
+  console.log('UID Firebase   :', currentUser?.uid);
+  console.log('Subscription ID:', sub.id);
+  console.log('Opted in       :', sub.optedIn);
+  console.log('Permissão      :', OS.Notifications.permission);
+  console.log('Token          :', sub.token ? 'presente' : 'ausente');
+  return { uid: currentUser?.uid, subId: sub.id, optedIn: sub.optedIn };
+};
+
+window.reconectarPush = async function() {
+  const OS = window.__OneSignal;
+  if (!OS) { toast('SDK de notificações não carregou','error'); return; }
+  try {
+    if (!OS.Notifications.permission) await OS.Notifications.requestPermission();
+    if (!OS.User.PushSubscription.optedIn) await OS.User.PushSubscription.optIn();
+    try { await OS.logout(); } catch(e) {}         // limpa vínculo antigo
+    const subId = await vincularUsuarioOneSignal(OS);
+    if (subId) toast('🔔 Notificações reconectadas!');
+    else toast('Não foi possível reconectar — verifique a permissão','error');
+  } catch(e) { console.warn('[reconectarPush]', e); toast('Erro: '+e.message,'error'); }
+};
 
 // ── Banner de permissão ──────────────────────────────────
 function checkNotifBanner() {
