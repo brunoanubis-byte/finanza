@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-f</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-g</div>
     </div>
   </nav>
 
@@ -2482,13 +2482,15 @@ window.renderDiagPush = function() {
   if (!OS) { el.innerHTML = linha('SDK','não carregou',false); return; }
   const sub = OS.User.PushSubscription;
   const email = currentUser?.email || '—';
+  const salvo = familyData?.members?.[currentUser?.uid]?.oneSignalId || null;
   el.innerHTML =
     linha('Conta', email) +
     linha('UID', (currentUser?.uid||'—').slice(0,14)+'…') +
     linha('Permissão', OS.Notifications.permission ? 'concedida' : 'negada', !!OS.Notifications.permission) +
     linha('Inscrito (optedIn)', sub.optedIn ? 'sim' : 'não', !!sub.optedIn) +
     linha('Token', sub.token ? 'presente' : 'AUSENTE', !!sub.token) +
-    linha('Subscription ID', sub.id || 'nenhum', !!sub.id);
+    linha('Subscription ID', sub.id || 'nenhum', !!sub.id) +
+    linha('ID salvo na família', salvo ? (salvo === sub.id ? 'em dia' : 'DESATUALIZADO') : 'nenhum', salvo === sub.id && !!sub.id);
 };
 
 // Diagnóstico em nível de navegador: mostra se o Service Worker está ativo e
