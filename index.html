@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-d</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-e</div>
     </div>
   </nav>
 
@@ -937,6 +937,15 @@ input::placeholder{color:var(--text3);}
             <div style="font-size:12px;color:var(--text3);margin-top:2px;">Refaz o vínculo deste aparelho com o serviço de push</div>
           </div>
           <button class="btn btn-ghost" onclick="reconectarPush()" style="padding:8px 16px;font-size:13px;white-space:nowrap;">↺ Reconectar</button>
+        </div>
+        <div style="padding:14px 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Diagnóstico deste aparelho</div>
+            <button class="btn btn-ghost" onclick="renderDiagPush()" style="padding:4px 12px;font-size:11px;">Atualizar</button>
+          </div>
+          <div id="push-diag" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;"></div>
+          <button class="btn btn-primary-outline" onclick="recriarInscricao()" style="width:100%;justify-content:center;margin-top:12px;font-size:13px;">⟳ Recriar inscrição de push</button>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;">Use se "Token" estiver AUSENTE ou se as notificações pararem de chegar. Gera um token novo neste aparelho.</div>
         </div>
         <div style="padding:12px 0;font-size:12px;color:var(--text3);">
           <div style="margin-bottom:6px;font-weight:600;color:var(--text2);">Notificações ativas:</div>
@@ -1468,7 +1477,7 @@ window.showPage = function(id, btn) {
   if (id==='transactions') renderAllTx();
   if (id==='categories') renderCats();
   if (id==='recorrentes') renderRecurrings();
-  if (id==='settings') renderSettings();
+  if (id==='settings') { renderSettings(); renderDiagPush(); }
   if (id==='parcelamentos') renderInstallments();
   if (id==='calendario') renderCalendar();
   if (id==='orcamento') renderOrcamento();
@@ -2458,6 +2467,52 @@ window.diagPush = function() {
   console.log('Permissão      :', OS.Notifications.permission);
   console.log('Token          :', sub.token ? 'presente' : 'ausente');
   return { uid: currentUser?.uid, subId: sub.id, optedIn: sub.optedIn };
+};
+
+// Mostra o diagnóstico NA TELA (Configurações) — no celular não há console
+window.renderDiagPush = function() {
+  const el = document.getElementById('push-diag'); if (!el) return;
+  const OS = window.__OneSignal;
+  const linha = (k,v,ok) => `<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
+      <span style="color:var(--text3);">${k}</span>
+      <span style="font-family:var(--font-mono);color:${ok===false?'var(--red)':ok===true?'var(--accent)':'var(--text2)'};text-align:right;word-break:break-all;max-width:62%;">${v}</span></div>`;
+  if (!OS) { el.innerHTML = linha('SDK','não carregou',false); return; }
+  const sub = OS.User.PushSubscription;
+  const email = currentUser?.email || '—';
+  el.innerHTML =
+    linha('Conta', email) +
+    linha('UID', (currentUser?.uid||'—').slice(0,14)+'…') +
+    linha('Permissão', OS.Notifications.permission ? 'concedida' : 'negada', !!OS.Notifications.permission) +
+    linha('Inscrito (optedIn)', sub.optedIn ? 'sim' : 'não', !!sub.optedIn) +
+    linha('Token', sub.token ? 'presente' : 'AUSENTE', !!sub.token) +
+    linha('Subscription ID', sub.id || 'nenhum', !!sub.id);
+};
+
+// Recria a inscrição do zero: força um token de push novo.
+// Necessário quando o token antigo foi invalidado (troca de service worker,
+// reinstalação do PWA) — o registro sobrevive mas fica "not subscribed".
+window.recriarInscricao = async function() {
+  const OS = window.__OneSignal;
+  if (!OS) { toast('SDK de notificações não carregou','error'); return; }
+  try {
+    toast('Recriando inscrição…');
+    const antigo = OS.User.PushSubscription.id;
+    try { await OS.User.PushSubscription.optOut(); } catch(e) { console.warn('optOut:', e); }
+    await new Promise(r => setTimeout(r, 1200));
+    if (!OS.Notifications.permission) await OS.Notifications.requestPermission();
+    await OS.User.PushSubscription.optIn();
+    // espera o token novo aparecer
+    let novo = null;
+    for (let i = 0; i < 15; i++) {
+      await new Promise(r => setTimeout(r, 500));
+      if (OS.User.PushSubscription.token && OS.User.PushSubscription.id) { novo = OS.User.PushSubscription.id; break; }
+    }
+    console.log('[recriarInscricao] antigo:', antigo, '→ novo:', novo, '| token:', OS.User.PushSubscription.token ? 'ok' : 'ausente');
+    if (!novo) { toast('Token de push não foi gerado neste aparelho','error'); renderDiagPush(); return; }
+    await vincularUsuarioOneSignal(OS);
+    renderDiagPush();
+    toast('✓ Inscrição recriada!');
+  } catch(e) { console.warn('[recriarInscricao]', e); toast('Erro: '+e.message,'error'); renderDiagPush(); }
 };
 
 window.reconectarPush = async function() {
