@@ -716,7 +716,7 @@ input::placeholder{color:var(--text3);}
         <span id="month-display">Mai 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.22-h</div>
+      <div style="text-align:center;font-size:9px;color:var(--text3);margin-top:10px;letter-spacing:0.5px;font-family:var(--font-mono);">BUILD 2026.07.23-a</div>
     </div>
   </nav>
 
@@ -1316,7 +1316,7 @@ function startListeners() {
       novas.forEach(tx => {
         const anterior = transactions.find(t => t.id === tx.id);
         if (anterior && !anterior.paid && tx.paid && tx.type === 'expense') {
-          notificarContaPaga(tx, tx.authorUid);
+          notificarContaPaga(tx);
         }
       });
     }
@@ -1880,8 +1880,8 @@ window.duplicateTx = function(id) {
 
 window.togglePaid = async function(id) {
   const tx=transactions.find(t=>t.id===id); if (!tx) return;
-  await fsSet('transactions',id,{...tx,paid:!tx.paid});
   const isPaid=!tx.paid;
+  await fsSet('transactions',id,{...tx,paid:isPaid,paidBy:isPaid?currentUser.uid:null,paidAt:isPaid?Date.now():null});
   logActivity('pay', `marcou "${tx.desc}" como ${tx.type==='income'?(isPaid?'recebido':'a receber'):(isPaid?'pago':'pendente')}`, {value:tx.value});
   const btn=document.querySelector(`[data-pay-id="${id}"]`);
   const item=document.querySelector(`[data-tx-id="${id}"]`);
@@ -2538,27 +2538,26 @@ async function verificarNotificacoes() {
 
 // ── Nova transação do parceiro ───────────────────────────
 function notificarNovaTxParceiro(tx) {
-  if (!currentUser || tx.authorUid === currentUser.uid) return;
-  if (!familyData?.members) return;
-  const autor = familyData.members[tx.authorUid];
-  if (!autor) return;
-  const nome = autor.name.split(' ')[0];
+  if (!currentUser || !familyData?.members) return;
+  // Quem CRIOU a transação é quem dispara o aviso para os demais.
+  // (antes era o contrário: o destinatário só era avisado se estivesse com o app aberto)
+  if (tx.authorUid !== currentUser.uid) return;
+  const nome = (currentUser.displayName || 'Alguém').split(' ')[0];
   const tipo = tx.type === 'income' ? 'receita' : 'despesa';
-  // Notifica todos os membros da família exceto quem adicionou
   Object.keys(familyData.members).forEach(uid => {
-    if (uid === tx.authorUid) return;
+    if (uid === currentUser.uid) return;   // não notifica a si mesmo
     enviarPushViaWorker(uid, `🔵 ${nome} adicionou uma ${tipo}`, `${tx.desc} — ${fmtCurrency(tx.value)}`, 'parceiro');
   });
 }
 
 // ── Conta paga pelo parceiro ─────────────────────────────
-function notificarContaPaga(tx, quemPagouUid) {
-  if (!currentUser || quemPagouUid === currentUser.uid) return;
-  const membro = familyData?.members?.[quemPagouUid];
-  const nome = membro ? membro.name.split(' ')[0] : 'Parceiro(a)';
-  // Notifica todos os membros exceto quem pagou
+function notificarContaPaga(tx) {
+  if (!currentUser || !familyData?.members) return;
+  // Só o aparelho de quem marcou como pago dispara o aviso
+  if (tx.paidBy !== currentUser.uid) return;
+  const nome = (currentUser.displayName || 'Alguém').split(' ')[0];
   Object.keys(familyData.members).forEach(uid => {
-    if (uid === quemPagouUid) return;
+    if (uid === currentUser.uid) return;
     enviarPushViaWorker(uid, `✅ Conta paga`, `${nome} pagou "${tx.desc}" — ${fmtCurrency(tx.value)}`, 'paga');
   });
 }
