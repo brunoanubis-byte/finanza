@@ -208,6 +208,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fchip.expense-chip.active{background:var(--red-dim);color:var(--red);}
 .fchip.pending-chip.active{background:var(--gold-dim);color:var(--gold);}
 .fchip.paid-chip.active{background:var(--accent-dim);color:var(--accent);}
+.fchip.late-chip.active{background:var(--red-dim);color:var(--red);}
 .filter-divider{width:1px;height:38px;background:var(--border);align-self:flex-end;margin-bottom:3px;}
 .select-filter{padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-family:var(--font-body);background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;outline:none;}
 .select-filter:focus{border-color:var(--accent);color:var(--text);}
@@ -447,6 +448,9 @@ input::placeholder{color:var(--text3);}
 .overdue-title{font-size:15px;font-weight:700;color:var(--red);}
 .overdue-sub{font-size:12px;color:var(--text2);margin-top:2px;}
 .overdue-alert .btn{white-space:nowrap;flex-shrink:0;}
+.overdue-dismiss{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;flex-shrink:0;border-radius:6px;transition:all 0.15s;}
+.overdue-dismiss:hover{color:var(--red);background:var(--red-dim);}
+@media(max-width:768px){.overdue-alert .overdue-dismiss{position:absolute;top:8px;right:8px;}.overdue-alert{position:relative;}}
 @media(max-width:768px){.overdue-alert{flex-wrap:wrap;}.overdue-alert .btn{width:100%;justify-content:center;}}
 
 /* ── Separador de dia (subtotal diário) ──────────────────── */
@@ -736,6 +740,7 @@ input::placeholder{color:var(--text3);}
           <div class="overdue-sub" id="overdue-sub"></div>
         </div>
         <button class="btn btn-ghost" onclick="verAtrasadas()" style="border-color:rgba(251,113,133,0.4);color:var(--red);">Ver atrasadas →</button>
+        <button class="overdue-dismiss" onclick="dismissOverdue()" title="Fechar aviso">✕</button>
       </div>
       <div class="page-header">
         <div><div class="page-title" id="dash-greeting">Dashboard</div><div class="page-subtitle" id="dash-subtitle">Resumo de Julho de 2026</div></div>
@@ -807,7 +812,7 @@ input::placeholder{color:var(--text3);}
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;">
           <div class="filter-group"><span class="filter-group-label">Tipo</span><div class="filter-chip-group"><button class="fchip active" id="fc-all" onclick="setFilter('type','all',this)">Todos</button><button class="fchip income-chip" id="fc-income" onclick="setFilter('type','income',this)">📈 Receitas</button><button class="fchip expense-chip" id="fc-expense" onclick="setFilter('type','expense',this)">📉 Despesas</button></div></div>
           <div class="filter-divider"></div>
-          <div class="filter-group"><span class="filter-group-label">Status</span><div class="filter-chip-group"><button class="fchip active" id="fc-all-status" onclick="setFilter('paid','all',this)">Todos</button><button class="fchip pending-chip" id="fb-pending" onclick="setFilter('paid','pending',this)">⏳ Pendentes</button><button class="fchip paid-chip" id="fb-paid" onclick="setFilter('paid','paid',this)">✓ Pagos</button></div></div>
+          <div class="filter-group"><span class="filter-group-label">Status</span><div class="filter-chip-group"><button class="fchip active" id="fc-all-status" onclick="setFilter('paid','all',this)">Todos</button><button class="fchip pending-chip" id="fb-pending" onclick="setFilter('paid','pending',this)">⏳ Pendentes</button><button class="fchip paid-chip" id="fb-paid" onclick="setFilter('paid','paid',this)">✓ Pagos</button><button class="fchip late-chip" id="fb-late" onclick="setFilter('paid','late',this)">🔴 Atrasadas</button></div></div>
           <div class="filter-divider"></div>
           <div class="filter-group"><span class="filter-group-label">Filtrar por</span><div style="display:flex;gap:6px;"><select class="select-filter" id="cat-filter" onchange="applyFilters()"><option value="all">Todas categorias</option></select><select class="select-filter" id="month-filter" onchange="applyFilters()"><option value="all">Todos os meses</option></select></div></div>
           <button id="clear-filters-btn" class="btn btn-ghost" onclick="clearAllFilters()" style="display:none;padding:6px 12px;font-size:12px;margin-left:auto;color:var(--red);border-color:rgba(248,113,113,0.3);">✕ Limpar</button>
@@ -2029,8 +2034,8 @@ function renderAllTx() {
   document.getElementById('cat-filter').innerHTML='<option value="all">Todas categorias</option>'+categories.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
   ['fc-all','fc-income','fc-expense'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   document.getElementById({all:'fc-all',income:'fc-income',expense:'fc-expense'}[filters.type]||'fc-all')?.classList.add('active');
-  ['fc-all-status','fb-pending','fb-paid'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
-  document.getElementById({all:'fc-all-status',pending:'fb-pending',paid:'fb-paid'}[filters.paid]||'fc-all-status')?.classList.add('active');
+  ['fc-all-status','fb-pending','fb-paid','fb-late'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.getElementById({all:'fc-all-status',pending:'fb-pending',paid:'fb-paid',late:'fb-late'}[filters.paid]||'fc-all-status')?.classList.add('active');
   applyFilters();
 }
 
@@ -2042,6 +2047,7 @@ window.applyFilters = function() {
   let filtered=[...transactions];
   if(filters.type!=='all')    filtered=filtered.filter(t=>t.type===filters.type);
   if(filters.paid==='pending')filtered=filtered.filter(t=>t.type==='expense'&&t.paid===false);
+  if(filters.paid==='late'){const hj=new Date().toISOString().slice(0,10);filtered=filtered.filter(t=>t.type==='expense'&&t.paid===false&&t.date<hj);}
   if(filters.paid==='paid')   filtered=filtered.filter(t=>t.paid!==false);
   if(filters.cat!=='all')     filtered=filtered.filter(t=>t.cat===filters.cat);
   if(filters.month!=='all')   filtered=filtered.filter(t=>t.date.startsWith(filters.month));
@@ -2055,7 +2061,7 @@ window.applyFilters = function() {
 };
 
 window.setFilter = function(key,val,el) {
-  if(key==='paid'){filters.paid=val;['fc-all-status','fb-pending','fb-paid'].forEach(id=>document.getElementById(id)?.classList.remove('active'));el.classList.add('active');}
+  if(key==='paid'){filters.paid=val;['fc-all-status','fb-pending','fb-paid','fb-late'].forEach(id=>document.getElementById(id)?.classList.remove('active'));el.classList.add('active');}
   else{filters[key]=val;['fc-all','fc-income','fc-expense'].forEach(id=>document.getElementById(id)?.classList.remove('active'));el.classList.add('active');}
   applyFilters();
 };
@@ -2066,7 +2072,7 @@ window.clearAllFilters = function() {
   document.getElementById('cat-filter').value='all';
   document.getElementById('month-filter').value='all';
   ['fc-all','fc-income','fc-expense'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
-  ['fc-all-status','fb-pending','fb-paid'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  ['fc-all-status','fb-pending','fb-paid','fb-late'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   document.getElementById('fc-all')?.classList.add('active');
   document.getElementById('fc-all-status')?.classList.add('active');
   applyFilters();
@@ -2595,15 +2601,23 @@ function renderOverdueAlert() {
   const atr = transactions.filter(t => t.type==='expense' && t.paid===false && t.date < hoje);
   if (!atr.length) { el.classList.remove('show'); return; }
   const total = atr.reduce((s,t)=>s+t.value,0);
+  // assinatura: se surgir nova atrasada, mudar o valor ou virar o dia, o aviso reaparece
+  const sig = `${hoje}|${atr.length}|${total.toFixed(2)}`;
+  if (localStorage.getItem('finanza_overdue_dismissed') === sig) { el.classList.remove('show'); return; }
+  el.dataset.sig = sig;
   document.getElementById('overdue-title').textContent = `${atr.length} conta${atr.length>1?'s':''} atrasada${atr.length>1?'s':''}`;
   document.getElementById('overdue-sub').textContent = `Total em atraso: ${fmtCurrency(total)} — resolva o quanto antes para evitar juros`;
   el.classList.add('show');
 }
+window.dismissOverdue = function() {
+  const el = document.getElementById('overdue-alert'); if (!el) return;
+  if (el.dataset.sig) localStorage.setItem('finanza_overdue_dismissed', el.dataset.sig);
+  el.classList.remove('show');
+};
 window.verAtrasadas = function() {
   showPageByName('transactions');
   clearAllFilters();
-  const fe=document.getElementById('fc-expense'); if(fe) setFilter('type','expense',fe);
-  const fp=document.getElementById('fb-pending'); if(fp) setFilter('paid','pending',fp);
+  const fl=document.getElementById('fb-late'); if(fl) setFilter('paid','late',fl);
 };
 
 // ── Lista de transações com subtotal diário ──────────────
